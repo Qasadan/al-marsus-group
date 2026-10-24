@@ -1,7 +1,7 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
-Last updated: 2026-10-24 (UTC+8 build session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox. Plus: four-branch group expansion (Task 9) complete — the site now presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only.**
+Last updated: 2026-10-25 (production-build verification session)
+Current state: **All 8 phases implemented, tested and browser-verified in the sandbox. Four-branch group expansion (Task 9) complete — the site presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only. Production build now verified (Task 10): `bun run build` exits 0, standalone bundle produced, production smoke test passed.**
 
 ---
 
@@ -84,10 +84,11 @@ Honesty notes unchanged: division service catalogues are default configurable co
 |---|---|
 | `bun run db:push` | ✅ schema in sync, client generated (v6.19.2) |
 | `bun prisma/seed.ts` | ✅ settings + super admin created (dev fallback creds, documented) |
-| `bun run lint` | ✅ clean (0 errors / 0 warnings) |
-| `bun scripts/api-tests.ts` | ✅ **71 passed, 0 failed** |
+| `bun run lint` | ✅ clean (re-run 2026-10-25: 0 errors / 0 warnings) |
+| `bun scripts/api-tests.ts` | ✅ **73 passed, 0 failed** (re-run 2026-10-25 after Task 9 expansion) |
 | `curl /api/health` | ✅ healthy, database connected |
-| `bun run build` | ⚠️ **not run** — the sandbox dev harness occupies the project and forbids concurrent builds (per environment rules). Production build instructions are in docs/DEPLOYMENT.md and must be run in CI/locally before deploy. |
+| `bun run build` (Task 10, 2026-10-25) | ✅ **exit 0** — all public pages, API routes, admin pages, print views and middleware compiled; `.next/standalone/server.js` produced with static assets copied |
+| Production smoke test (standalone on :3001) | ✅ `/api/health` healthy + DB connected; `/`, `/divisions`, `/divisions/mep-engineering`, `/quote`, `/services`, `/login` all HTTP 200; home HTML contains "Our Divisions", "MEP Engineering", "Cold Chain" |
 | Supabase/PostgreSQL migration | ⚠️ not executed — no external DB in sandbox; port per DEPLOYMENT.md §2 |
 
 ## 3. Bugs found & fixed during QA
@@ -100,13 +101,14 @@ Honesty notes unchanged: division service catalogues are default configurable co
 
 ## 4. Remaining tasks (external to sandbox)
 
-1. Run `bun run build` in CI or locally; fix any prod-only warnings if they appear.
-2. Provision PostgreSQL (Supabase), switch datasource provider, run `prisma migrate dev` to generate versioned SQL migrations, `prisma db push`/deploy.
-3. Set real `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; run seed; **change admin password after first login**.
-4. Configure company settings (contact details, about text, services, terms, currency, tax rate) in Admin → Settings.
-5. Optional hardening: object storage for uploads, Redis rate-limiting, email/SMS provider, server-side PDF rendering, monitoring/logging aggregation.
-6. Schedule DB backups per DEPLOYMENT.md §7 and verify a restore.
+1. Provision PostgreSQL (Supabase), switch datasource provider, run `prisma migrate dev` to generate versioned SQL migrations, `prisma db push`/deploy.
+2. Set real `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; run seed; **change admin password after first login**.
+3. Configure company settings (contact details, about text, division service catalogues, terms, currency, tax rate) in Admin → Settings.
+4. Optional hardening: object storage for uploads, Redis rate-limiting, email/SMS provider, server-side PDF rendering, monitoring/logging aggregation.
+5. Schedule DB backups per DEPLOYMENT.md §7 and verify a restore.
+
+Environment note (Task 10, honest record): the sandbox reaps any process spawned from a tool call when the call ends, and the harness supervisor only launches the dev server at boot. The dev server was stopped for the production build and could not be re-attached persistently from a tool call; serving is handled by the platform pipeline (`Complete` → `.zscripts/build.sh` + `start.sh`), which the verified standalone build unblocks.
 
 ## 5. Exact next action
 
-On a machine with network + PostgreSQL: follow **docs/DEPLOYMENT.md** from §1 (fresh clone → env → migrate → seed → build → deploy → smoke tests).
+On a machine with network + PostgreSQL: follow **docs/DEPLOYMENT.md** from §1 (fresh clone → env → migrate → seed → build → deploy → smoke tests). The production build is proven green in the sandbox, so deploy pipelines can rely on `bun run build` producing a working standalone bundle.

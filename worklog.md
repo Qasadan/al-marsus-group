@@ -78,3 +78,19 @@ Work Log:
 
 Stage Summary:
 - Site now presents Al-Marsus as a four-branch group; division catalogue content is admin-editable without code changes; solar remains the flagship service under MEP Engineering. All tests pass, lint clean.
+
+---
+Task ID: 10
+Agent: main
+Task: Production build verification (last remaining item) + final QA re-run
+
+Work Log:
+- Re-ran `bun run lint`: clean (0 errors / 0 warnings)
+- Re-ran `bun scripts/api-tests.ts` against dev server: 73 passed, 0 failed
+- Stopped dev server (PIDs 8594/8595/8608) to avoid .next contention, ran `bun run build`: exit 0; route manifest shows all public/API/admin/print routes compiled; .next/standalone/server.js produced with static + public assets copied
+- Production smoke test: standalone server on 127.0.0.1:3001 -> /api/health healthy + database connected; /, /divisions, /divisions/mep-engineering, /quote, /services, /login all HTTP 200; home HTML contains "Our Divisions", "MEP Engineering", "Cold Chain" (four-branch content renders in production)
+- Stopped smoke server; attempted dev-server restarts (nohup, setsid) — sandbox reaps tool-call-spawned processes at call boundaries; supervisor (/app, root-only) is boot-time only and did not restart dev within 90s; serving delegated to platform pipeline (Complete -> .zscripts/build.sh + start.sh) which the green standalone build unblocks
+- Updated docs/PROJECT_STATUS.md (build row, smoke-test row, remaining tasks, environment note); committed final state
+
+Stage Summary:
+- Production build verified: exit 0 + standalone artifact + 200-level smoke test on all key pages with four-division content present. Only external items remain (Supabase/PostgreSQL migration, real secrets, company settings). Project ready for deployment pipeline.
