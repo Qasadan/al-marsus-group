@@ -1,0 +1,52 @@
+import { z } from "zod";
+import { NextRequest } from "next/server";
+import { handleRoute, ok, requireAuth, parseBody } from "@/lib/api";
+import { getPublicSettings, getSettings } from "@/lib/settings";
+import { writeAudit } from "@/lib/audit";
+import { db } from "@/lib/db";
+
+// Public: website content + contact details (safe subset)
+export async function GET() {
+  return handleRoute(async () => {
+    const settings = await getPublicSettings();
+    return ok(settings);
+  });
+}
+
+const updateSchema = z.object({
+  companyName: z.string().min(1).max(200).optional(),
+  tagline: z.string().max(300).nullable().optional(),
+  heroTitle: z.string().max(200).nullable().optional(),
+  heroSubtitle: z.string().max(500).nullable().optional(),
+  aboutText: z.string().max(5000).nullable().optional(),
+  missionText: z.string().max(2000).nullable().optional(),
+  visionText: z.string().max(2000).nullable().optional(),
+  servicesJson: z.string().max(20000).nullable().optional(),
+  email: z.string().email().nullable().optional(),
+  phone: z.string().max(30).nullable().optional(),
+  whatsappNumber: z.string().max(30).nullable().optional(),
+  address: z.string().max(300).nullable().optional(),
+  currency: z.string().min(3).max(3).optional(),
+  taxRate: z.number().min(0).max(100).optional(),
+  quotationPrefix: z.string().min(1).max(10).optional(),
+  invoicePrefix: z.string().min(1).max(10).optional(),
+  projectPrefix: z.string().min(1).max(10).optional(),
+  surveyPrefix: z.string().min(1).max(10).optional(),
+  maintenancePrefix: z.string().min(1).max(10).optional(),
+  serviceRequestPrefix: z.string().min(1).max(10).optional(),
+  purchaseOrderPrefix: z.string().min(1).max(10).optional(),
+  quotationTerms: z.string().max(5000).nullable().optional(),
+  invoiceTerms: z.string().max(5000).nullable().optional(),
+  logoUrl: z.string().max(500).optional(),
+});
+
+export async function PUT(req: NextRequest) {
+  return handleRoute(async () => {
+    const session = await requireAuth("settings");
+    const { data } = await parseBody(req, updateSchema);
+    await getSettings(); // ensure exists
+    const updated = await db.companySettings.update({ where: { id: "main" }, data });
+    await writeAudit(req, session, "UPDATE", "CompanySettings", "main", { keys: Object.keys(data) });
+    return ok(updated);
+  });
+}
