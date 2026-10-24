@@ -85,7 +85,7 @@ export default function SuppliersPage() {
       {loading ? (
         <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
       ) : items.length === 0 ? (
-        <EmptyState message="No suppliers yet. Add the vendors you purchase solar equipment from." />
+        <EmptyState message="No suppliers yet. Add the vendors you purchase equipment and materials from." />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((s) => (

@@ -9,17 +9,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader, StatusBadge, Pagination, EmptyState, useConfirm } from "@/components/admin/shared";
 import { api, ApiClientError, formatDateDisplay } from "@/lib/client";
+import { DIVISION_CODES, DIVISIONS, divisionLabel } from "@/lib/divisions";
 import { Plus, Search, Loader2, Trash2, ArrowRightLeft, CalendarClock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Lead {
-  id: string; name: string; email: string | null; phone: string; source: string; status: string;
+  id: string; name: string; email: string | null; phone: string; division: string | null; source: string; status: string;
   notes: string | null; nextFollowUpAt: string | null; convertedCustomerId: string | null;
   createdAt: string;
   convertedCustomer?: { id: string; name: string } | null;
 }
 
-const emptyForm = { name: "", email: "", phone: "", source: "WEBSITE", status: "NEW", notes: "", followUpDate: "" };
+const emptyForm = { name: "", email: "", phone: "", division: "MEP_ENGINEERING", source: "WEBSITE", status: "NEW", notes: "", followUpDate: "" };
 
 export default function LeadsPage() {
   const [items, setItems] = useState<Lead[]>([]);
@@ -60,8 +61,12 @@ export default function LeadsPage() {
       await api("/api/leads", {
         method: "POST",
         json: {
-          ...form,
+          name: form.name,
           email: form.email || null,
+          phone: form.phone,
+          division: form.division,
+          source: form.source,
+          status: form.status,
           notes: form.notes || null,
           nextFollowUpAt: form.followUpDate || null,
         },
@@ -169,6 +174,7 @@ export default function LeadsPage() {
                   <td className="px-4 py-3">
                     <div className="font-medium">{l.name}</div>
                     <div className="text-xs text-muted-foreground">{l.phone}{l.email ? ` · ${l.email}` : ""}</div>
+                    {l.division && <div className="mt-1"><span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">{divisionLabel(l.division)}</span></div>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{l.source.replace("_", " ")}</td>
                   <td className="px-4 py-3">
@@ -229,6 +235,17 @@ export default function LeadsPage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
+                <Label>Division</Label>
+                <Select value={form.division} onValueChange={(v) => setForm({ ...form, division: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {DIVISION_CODES.map((code) => (
+                      <SelectItem key={code} value={code}>{DIVISIONS[code].shortName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
                 <Label>Source</Label>
                 <Select value={form.source} onValueChange={(v) => setForm({ ...form, source: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -241,10 +258,10 @@ export default function LeadsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="l-followup">Next follow-up</Label>
-                <Input id="l-followup" type="date" value={form.followUpDate} onChange={(e) => setForm({ ...form, followUpDate: e.target.value })} />
-              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="l-followup">Next follow-up</Label>
+              <Input id="l-followup" type="date" value={form.followUpDate} onChange={(e) => setForm({ ...form, followUpDate: e.target.value })} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="l-notes">Notes</Label>

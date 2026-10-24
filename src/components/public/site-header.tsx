@@ -3,8 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, MessageCircle } from "lucide-react";
+import { Menu, X, MessageCircle, ChevronDown, Zap, Cpu, HardHat, Snowflake, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -13,6 +22,8 @@ const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
   { href: "/contact", label: "Contact" },
 ];
+
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
 
 export function SiteHeader({
   companyName = "Al-Marsus Group Ltd",
@@ -25,19 +36,74 @@ export function SiteHeader({
 }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isDivisionRoute = pathname.startsWith("/divisions");
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-3" aria-label={`${companyName} home`}>
-            { }
             <img src={logoUrl} alt={`${companyName} logo`} className="h-10 w-auto" />
             <span className="hidden sm:block font-semibold text-lg text-[var(--brand-indigo)]">{companyName}</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS.slice(0, 2).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  pathname === link.href
+                    ? "text-[var(--brand-indigo)] bg-secondary"
+                    : "text-muted-foreground hover:text-[var(--brand-indigo)] hover:bg-muted"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Divisions dropdown — the group's four business branches */}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={`inline-flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors outline-none ${
+                  isDivisionRoute
+                    ? "text-[var(--brand-indigo)] bg-secondary"
+                    : "text-muted-foreground hover:text-[var(--brand-indigo)] hover:bg-muted"
+                }`}
+                aria-label="Our divisions"
+              >
+                Our Divisions <ChevronDown className="h-3.5 w-3.5" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-72">
+                <DropdownMenuLabel>Four specialised branches</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {DIVISION_CODES.map((code) => {
+                  const d = DIVISIONS[code];
+                  const Icon = DIVISION_ICONS[d.icon];
+                  return (
+                    <DropdownMenuItem key={code} asChild>
+                      <Link href={`/divisions/${d.slug}`} className="flex items-start gap-3 py-2.5">
+                        <span className="mt-0.5 rounded-md bg-secondary p-1.5 text-[var(--brand-indigo)]">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span>
+                          <span className="block text-sm font-medium">{d.shortName}</span>
+                          <span className="block text-xs text-muted-foreground line-clamp-1">{d.fullName}</span>
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
+                  );
+                })}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/divisions" className="flex items-center gap-2 text-sm font-medium text-[var(--brand-green)]">
+                    <LayoutGrid className="h-4 w-4" /> All divisions overview
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {NAV_LINKS.slice(2).map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -83,8 +149,40 @@ export function SiteHeader({
       </div>
 
       {open && (
-        <nav className="md:hidden border-t border-border bg-white px-4 pb-4 pt-2 space-y-1" aria-label="Mobile navigation">
-          {NAV_LINKS.map((link) => (
+        <nav className="md:hidden border-t border-border bg-white px-4 pb-4 pt-2 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto" aria-label="Mobile navigation">
+          {NAV_LINKS.slice(0, 2).map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              className={`block px-3 py-2.5 rounded-md text-sm font-medium ${
+                pathname === link.href ? "text-[var(--brand-indigo)] bg-secondary" : "text-foreground hover:bg-muted"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Our Divisions
+          </p>
+          {DIVISION_CODES.map((code) => {
+            const d = DIVISIONS[code];
+            const Icon = DIVISION_ICONS[d.icon];
+            return (
+              <Link
+                key={code}
+                href={`/divisions/${d.slug}`}
+                onClick={() => setOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium ${
+                  pathname === `/divisions/${d.slug}` ? "text-[var(--brand-indigo)] bg-secondary" : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <Icon className="h-4 w-4 text-[var(--brand-indigo)]" />
+                {d.fullName}
+              </Link>
+            );
+          })}
+          {NAV_LINKS.slice(2).map((link) => (
             <Link
               key={link.href}
               href={link.href}

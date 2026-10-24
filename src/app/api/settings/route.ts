@@ -22,6 +22,7 @@ const updateSchema = z.object({
   missionText: z.string().max(2000).nullable().optional(),
   visionText: z.string().max(2000).nullable().optional(),
   servicesJson: z.string().max(20000).nullable().optional(),
+  divisionsJson: z.string().max(60000).nullable().optional(),
   email: z.string().email().nullable().optional(),
   phone: z.string().max(30).nullable().optional(),
   whatsappNumber: z.string().max(30).nullable().optional(),

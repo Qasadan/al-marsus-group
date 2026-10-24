@@ -79,6 +79,7 @@ model Lead {
   name                String
   email               String?
   phone               String
+  division            String? // MEP_ENGINEERING | DIGITAL | OPERATIONS_SERVICES | COLD_CHAIN
   source              String    @default("WEBSITE") // WEBSITE | REFERRAL | WALK_IN | PHONE | OTHER
   status              String    @default("NEW") // NEW | CONTACTED | QUALIFIED | CONVERTED | LOST
   notes               String?
@@ -102,6 +103,7 @@ model QuoteRequest {
   email        String
   phone        String
   address      String?
+  division     String? // MEP_ENGINEERING | DIGITAL | OPERATIONS_SERVICES | COLD_CHAIN
   propertyType String   @default("RESIDENTIAL") // RESIDENTIAL | COMMERCIAL | INDUSTRIAL
   monthlyBill  String?
   message      String?
@@ -149,6 +151,7 @@ model SiteSurvey {
 model Quotation {
   id                  String    @id @default(cuid())
   quoteNumber         String    @unique
+  division            String? // MEP_ENGINEERING | DIGITAL | OPERATIONS_SERVICES | COLD_CHAIN
   customerId          String
   customer            Customer  @relation("QuotationCustomer", fields: [customerId], references: [id])
   surveyId            String?
@@ -206,6 +209,7 @@ model Project {
   id             String    @id @default(cuid())
   code           String    @unique
   name           String
+  division       String? // MEP_ENGINEERING | DIGITAL | OPERATIONS_SERVICES | COLD_CHAIN
   customerId     String
   customer       Customer  @relation("ProjectCustomer", fields: [customerId], references: [id])
   quotationId    String?   @unique
@@ -293,6 +297,7 @@ model GalleryItem {
   title       String
   description String?
   imageUrl    String
+  division    String? // MEP_ENGINEERING | DIGITAL | OPERATIONS_SERVICES | COLD_CHAIN
   category    String? // RESIDENTIAL | COMMERCIAL | INDUSTRIAL
   location    String?
   capacityKw  Float?
@@ -574,7 +579,8 @@ model CompanySettings {
   aboutText            String?
   missionText          String?
   visionText           String?
-  servicesJson         String? // JSON array of service definitions
+  servicesJson         String? // JSON array of group-wide service definitions (legacy)
+  divisionsJson        String? // JSON array of per-division content overrides (tagline/description/services)
   email                String?
   phone                String?
   whatsappNumber       String?

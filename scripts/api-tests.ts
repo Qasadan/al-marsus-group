@@ -57,10 +57,16 @@ async function main() {
 
     const valid = await req("POST", "/api/quote-requests", {
       name: "Test Website Visitor", email: `visitor-${RUN}@example.com`, phone: "+254711222333",
-      address: "Nairobi, Kilimani", propertyType: "RESIDENTIAL", monthlyBill: "12,000",
+      address: "Nairobi, Kilimani", division: "COLD_CHAIN", propertyType: "RESIDENTIAL", monthlyBill: "12,000",
       message: "Interested in a 5kW hybrid system.",
     }, false);
     check("valid submission saved (201, or 429 if rate-limited)", valid.status === 201 || valid.status === 429);
+
+    const badDivision = await req("POST", "/api/quote-requests", {
+      name: "Division Test", email: `division-${RUN}@example.com`, phone: "+254711222334",
+      division: "NOT_A_DIVISION", propertyType: "RESIDENTIAL",
+    }, false);
+    check("invalid division rejected (422)", badDivision.status === 422);
 
     const unauthList = await req("GET", "/api/quote-requests", undefined, false);
     check("admin listing blocked without auth (401)", unauthList.status === 401);
@@ -79,6 +85,10 @@ async function main() {
 
     const staffList = await req("GET", "/api/staff");
     check("super admin can list staff", envelopeOk(staffList));
+
+    const qrList = await req("GET", "/api/quote-requests?division=COLD_CHAIN&page=1&pageSize=50");
+    const qrData = (qrList.json as { data?: { items?: { division: string | null }[] } })?.data;
+    check("division filter returns cold-chain request", envelopeOk(qrList) && (qrData?.items ?? []).some((i) => i.division === "COLD_CHAIN"));
   }
 
   console.log("\n=== 4. Customers & leads ===");

@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PageHeader } from "@/components/admin/shared";
 import { api, ApiClientError, formatMoneyDisplay } from "@/lib/client";
+import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
 import { useSettingsStore } from "@/lib/settings-store";
 import { Loader2, Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -28,7 +29,7 @@ export default function NewQuotationPage() {
   const [customers, setCustomers] = useState<{ id: string; name: string }[]>([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
   const [surveys, setSurveys] = useState<{ id: string; customer: { id: string; name: string }; avgMonthlyKwh: number | null }[]>([]);
-  const [form, setForm] = useState({ customerId: "", surveyId: "none", title: "", discount: "0", taxRate: "", notes: "" });
+  const [form, setForm] = useState({ customerId: "", surveyId: "none", title: "", division: "MEP_ENGINEERING", discount: "0", taxRate: "", notes: "" });
   const [taxTouched, setTaxTouched] = useState(false);
   const taxRateEffective = taxTouched ? form.taxRate : taxRateDefault > 0 ? String(taxRateDefault) : form.taxRate;
   const [items, setItems] = useState<Item[]>([{ ...emptyItem }]);
@@ -67,6 +68,7 @@ export default function NewQuotationPage() {
           customerId: form.customerId,
           surveyId: form.surveyId === "none" ? null : form.surveyId,
           title: form.title,
+          division: form.division,
           discount: Number(form.discount || 0),
           taxRate: Number(taxRateEffective || 0),
           notes: form.notes || null,
@@ -115,6 +117,17 @@ export default function NewQuotationPage() {
                 <Label htmlFor="n-title">Title *</Label>
                 <Input id="n-title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="e.g. 5kW hybrid solar installation" maxLength={200} />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Division</Label>
+              <Select value={form.division} onValueChange={(v) => setForm({ ...form, division: v })}>
+                <SelectTrigger><SelectValue placeholder="Select division" /></SelectTrigger>
+                <SelectContent>
+                  {DIVISION_CODES.map((code) => (
+                    <SelectItem key={code} value={code}>{DIVISIONS[code].fullName}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label>Link completed survey (optional)</Label>

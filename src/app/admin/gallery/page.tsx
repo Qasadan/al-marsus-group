@@ -11,15 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader, EmptyState, useConfirm } from "@/components/admin/shared";
 import { api, ApiClientError } from "@/lib/client";
+import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
 import { Plus, Loader2, Pencil, Trash2, Upload, Globe } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface GalleryRow {
-  id: string; title: string; description: string | null; imageUrl: string; category: string | null;
+  id: string; title: string; description: string | null; imageUrl: string; division: string | null; category: string | null;
   location: string | null; capacityKw: number | null; isPublic: boolean; projectId: string | null; sortOrder: number;
 }
 
-const emptyForm = { title: "", description: "", imageUrl: "", category: "RESIDENTIAL", location: "", capacityKw: "", isPublic: true };
+const emptyForm = { title: "", description: "", imageUrl: "", division: "MEP_ENGINEERING", category: "RESIDENTIAL", location: "", capacityKw: "", isPublic: true };
 
 export default function GalleryPage() {
   const [items, setItems] = useState<GalleryRow[]>([]);
@@ -73,6 +74,7 @@ export default function GalleryPage() {
         title: form.title,
         description: form.description || null,
         imageUrl: form.imageUrl,
+        division: form.division,
         category: form.category || null,
         location: form.location || null,
         capacityKw: form.capacityKw ? Number(form.capacityKw) : null,
@@ -139,13 +141,13 @@ export default function GalleryPage() {
                   <div>
                     <h3 className="font-medium">{g.title}</h3>
                     <p className="text-xs text-muted-foreground">
-                      {[g.category, g.location, g.capacityKw ? `${g.capacityKw} kW` : null].filter(Boolean).join(" · ") || "—"}
+                      {[g.division ? DIVISIONS[g.division as keyof typeof DIVISIONS]?.shortName : null, g.category, g.location, g.capacityKw ? `${g.capacityKw} kW` : null].filter(Boolean).join(" · ") || "—"}
                     </p>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     <Button variant="ghost" size="icon" onClick={() => { setEditing(g); setForm({
                       title: g.title, description: g.description ?? "", imageUrl: g.imageUrl,
-                      category: g.category ?? "RESIDENTIAL", location: g.location ?? "",
+                      division: g.division ?? "MEP_ENGINEERING", category: g.category ?? "RESIDENTIAL", location: g.location ?? "",
                       capacityKw: g.capacityKw?.toString() ?? "", isPublic: g.isPublic,
                     }); setError(""); setDialogOpen(true); }} aria-label={`Edit ${g.title}`}>
                       <Pencil className="h-4 w-4" />
@@ -194,6 +196,19 @@ export default function GalleryPage() {
             <div className="space-y-1.5">
               <Label htmlFor="g-desc">Description</Label>
               <Textarea id="g-desc" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Division</Label>
+              <Select value={form.division} onValueChange={(v) => setForm({ ...form, division: v })}>
+                <SelectTrigger><SelectValue placeholder="Select division" /></SelectTrigger>
+                <SelectContent>
+                  {DIVISION_CODES.map((code) => (
+                    <SelectItem key={code} value={code}>
+                      {DIVISIONS[code].fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">

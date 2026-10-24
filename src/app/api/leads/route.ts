@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { handleRoute, ok, requireAuth, parseBody, buildPagination } from "@/lib/api";
 import { writeAudit, notifyAdmins } from "@/lib/audit";
 import { LEAD_SOURCES, LEAD_STATUSES, oneOf } from "@/lib/constants";
+import { DIVISION_CODES } from "@/lib/divisions";
 
 export async function GET(req: NextRequest) {
   return handleRoute(async () => {
@@ -34,6 +35,7 @@ const createSchema = z.object({
   name: z.string().min(2, "Name is required").max(200),
   email: z.string().email("Invalid email").nullable().optional(),
   phone: z.string().min(7, "Phone is required").max(30),
+  division: z.enum(DIVISION_CODES).nullable().optional(),
   source: z.string().refine(oneOf(LEAD_SOURCES, "Source")).default("WEBSITE"),
   status: z.string().refine(oneOf(LEAD_STATUSES, "Status")).default("NEW"),
   notes: z.string().max(2000).nullable().optional(),

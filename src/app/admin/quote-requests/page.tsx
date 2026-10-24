@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PageHeader, StatusBadge, Pagination, EmptyState } from "@/components/admin/shared";
 import { api, ApiClientError, formatDateTimeDisplay } from "@/lib/client";
+import { DIVISION_CODES, DIVISIONS, divisionLabel } from "@/lib/divisions";
 import { Loader2, Target } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface QuoteRequest {
   id: string; name: string; email: string; phone: string; address: string | null;
-  propertyType: string; monthlyBill: string | null; message: string | null;
+  division: string | null; propertyType: string; monthlyBill: string | null; message: string | null;
   status: string; ipAddress: string | null; createdAt: string;
 }
 
@@ -18,6 +19,7 @@ export default function QuoteRequestsPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState("all");
+  const [division, setDivision] = useState("all");
   const [loading, setLoading] = useState(true);
   const pageSize = 20;
 
@@ -26,6 +28,7 @@ export default function QuoteRequestsPage() {
     try {
       const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
       if (status !== "all") params.set("status", status);
+      if (division !== "all") params.set("division", division);
       const data = await api<{ items: QuoteRequest[]; total: number }>(`/api/quote-requests?${params}`);
       setItems(data.items);
       setTotal(data.total);
@@ -34,7 +37,7 @@ export default function QuoteRequestsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, status]);
+  }, [page, status, division]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -46,7 +49,8 @@ export default function QuoteRequestsPage() {
           method: "POST",
           json: {
             name: req.name, email: req.email, phone: req.phone, source: "WEBSITE", status: "NEW",
-            notes: `From website quote request. Property: ${req.propertyType}${req.monthlyBill ? `, bill: ${req.monthlyBill}` : ""}${req.message ? `. ${req.message}` : ""}`,
+            division: req.division,
+            notes: `From website quote request. Division: ${req.division ? divisionLabel(req.division) : "General"}. Property: ${req.propertyType}${req.monthlyBill ? `, bill: ${req.monthlyBill}` : ""}${req.message ? `. ${req.message}` : ""}`,
           },
         });
         toast({ title: "Converted to lead" });
@@ -63,13 +67,27 @@ export default function QuoteRequestsPage() {
     <div>
       <PageHeader title="Quote Requests" description="Public website form submissions — validate, review and convert to leads." />
 
-      <div className="mb-4">
+      <div className="mb-4 space-y-2">
         <div className="flex gap-2 flex-wrap">
           {["all", "NEW", "REVIEWED", "CONVERTED", "SPAM"].map((s) => (
             <Button key={s} variant={status === s ? "default" : "outline"} size="sm"
               onClick={() => { setStatus(s); setPage(1); }}
               className={status === s ? "brand-gradient text-white" : ""}>
               {s === "all" ? "All" : s}
+            </Button>
+          ))}
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <Button variant={division === "all" ? "default" : "outline"} size="sm"
+            onClick={() => { setDivision("all"); setPage(1); }}
+            className={division === "all" ? "brand-gradient text-white" : ""}>
+            All divisions
+          </Button>
+          {DIVISION_CODES.map((code) => (
+            <Button key={code} variant={division === code ? "default" : "outline"} size="sm"
+              onClick={() => { setDivision(code); setPage(1); }}
+              className={division === code ? "brand-gradient text-white" : ""}>
+              {DIVISIONS[code].shortName}
             </Button>
           ))}
         </div>
@@ -85,10 +103,15 @@ export default function QuoteRequestsPage() {
             <div key={r.id} className="rounded-lg border border-border bg-card p-5">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-semibold">{r.name}</span>
                     <StatusBadge status={r.status} />
-                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">{r.propertyType}</span>
+                    {r.division && (
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">
+                        {divisionLabel(r.division)}
+                      </span>
+                    )}
+                    <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-accent-foreground">{r.propertyType}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {r.phone} · {r.email}{r.address ? ` · ${r.address}` : ""}{r.monthlyBill ? ` · Bill: ${r.monthlyBill}` : ""}

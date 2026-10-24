@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { resolveDivisions, type ResolvedDivision } from "./divisions";
 
 export interface PublicSettings {
   companyName: string;
@@ -9,6 +10,7 @@ export interface PublicSettings {
   missionText: string | null;
   visionText: string | null;
   services: { title: string; description: string; icon?: string }[];
+  divisions: ResolvedDivision[];
   email: string | null;
   phone: string | null;
   whatsappNumber: string | null;
@@ -39,6 +41,7 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     missionText: s?.missionText ?? null,
     visionText: s?.visionText ?? null,
     services,
+    divisions: resolveDivisions(s?.divisionsJson ?? null),
     email: s?.email ?? null,
     phone: s?.phone ?? null,
     whatsappNumber: s?.whatsappNumber ?? null,

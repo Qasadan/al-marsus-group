@@ -138,7 +138,7 @@ export default function InventoryPage() {
     <div>
       <PageHeader
         title="Inventory"
-        description="Solar panels, batteries, inverters, cables and accessories with full movement ledger."
+        description="Panels, batteries, inverters, cables, refrigeration spares and accessories with a full movement ledger."
         actions={
           <Button onClick={() => { setEditing(null); setForm(emptyForm); setError(""); setDialogOpen(true); }}>
             <Plus className="h-4 w-4" /> Add Product

@@ -27,21 +27,18 @@ async function main() {
     create: {
       id: "main",
       companyName: "Al-Marsus Group Ltd",
-      tagline: "Reliable solar energy solutions",
+      tagline: "Engineering · Digital · Operations · Cold Chain",
       // PLACEHOLDER website copy — configure in Admin → Settings before launch.
-      heroTitle: "Power Your Future With Solar Energy",
+      heroTitle: "Engineering, Digital, Operations & Cold Chain — Delivered by One Group",
       heroSubtitle:
-        "Professional solar design, installation and maintenance for homes and businesses. Configure this text in Admin → Settings.",
+        "Al-Marsus Group Ltd serves homes and businesses through four specialised divisions: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics. Configure this text in Admin → Settings.",
       aboutText:
-        "Al-Marsus Group Ltd is a solar energy installation company. [Placeholder — replace with the company's real history, mission and certifications in Admin → Settings.]",
+        "Al-Marsus Group Ltd is a multi-division engineering and services group operating through four specialised branches: Al-Marsus MEP Engineering, Al-Marsus Digital, Al-Marsus Operations Services, and Al-Marsus Cold Chain Storage & Logistics. [Placeholder — replace with the company's real history, mission and certifications in Admin → Settings.]",
       missionText: "[Placeholder — configure in Settings]",
       visionText: "[Placeholder — configure in Settings]",
-      servicesJson: JSON.stringify([
-        { title: "Residential Solar Installation", description: "Complete rooftop solar systems for homes, from assessment to handover. [Placeholder — edit in Settings]" },
-        { title: "Commercial & Industrial Solar", description: "Grid-tied and hybrid systems for businesses and industry. [Placeholder — edit in Settings]" },
-        { title: "Solar Maintenance & Support", description: "Preventive maintenance, repairs and system health checks. [Placeholder — edit in Settings]" },
-        { title: "Energy Assessment & Design", description: "Site surveys and preliminary system sizing by qualified personnel. [Placeholder — edit in Settings]" },
-      ]),
+      // Division service catalogues are seeded as built-in defaults and editable
+      // per-division in Admin → Settings (divisionsJson). Group-wide extras start empty.
+      servicesJson: null,
       email: null,
       phone: null,
       whatsappNumber: null,

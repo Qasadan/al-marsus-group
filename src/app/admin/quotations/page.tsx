@@ -50,7 +50,7 @@ export default function QuotationsPage() {
     <div>
       <PageHeader
         title="Quotations"
-        description="Create, send and track solar quotations with server-calculated totals."
+        description="Create, send and track quotations across all divisions with server-calculated totals."
         actions={
           <Link href="/admin/quotations/new">
             <Button><Plus className="h-4 w-4" /> New Quotation</Button>

@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { handleRoute, ok, requireAuth, parseBody, ApiError } from "@/lib/api";
 import { writeAudit } from "@/lib/audit";
+import { DIVISION_CODES } from "@/lib/divisions";
 
 export async function GET(req: NextRequest) {
   return handleRoute(async () => {
@@ -21,6 +22,7 @@ const createSchema = z.object({
   title: z.string().min(2, "Title is required").max(200),
   description: z.string().max(2000).nullable().optional(),
   imageUrl: z.string().min(1, "Image URL is required").max(500),
+  division: z.enum(DIVISION_CODES).nullable().optional(),
   category: z.string().max(50).nullable().optional(),
   location: z.string().max(200).nullable().optional(),
   capacityKw: z.number().positive().nullable().optional(),

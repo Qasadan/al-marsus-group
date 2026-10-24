@@ -1,7 +1,28 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
 Last updated: 2026-10-24 (UTC+8 build session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox.**
+Current state: **All 8 phases implemented, tested and browser-verified in the sandbox. Plus: four-branch group expansion (Task 9) complete — the site now presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only.**
+
+---
+
+## 0. Four-branch group expansion (latest update) ✅
+
+The company operates FOUR divisions; the website and management system now reflect this:
+
+1. **Al-Marsus MEP Engineering** — mechanical, electrical & plumbing, with solar energy as flagship service
+2. **Al-Marsus Digital** — web/software, networks, CCTV & access control, smart monitoring, IT support
+3. **Al-Marsus Operations Services** — facility management, technical manpower, generator/plant operation
+4. **Al-Marsus Cold Chain Storage & Logistics** — cold rooms, warehousing, refrigerated transport, monitoring
+
+What was built:
+- `src/lib/divisions.ts` — built-in division definitions (names, slugs, taglines, descriptions, service catalogues) with `resolveDivisions()` merging admin overrides
+- Public: home group hero + 4-division grid; `/divisions` + `/divisions/[slug]` pages; services grouped by division; about group-structure section; projects division filter; header dropdown + footer column; generalized metadata
+- Quote form: required "Which division?" select (validated server-side, rate-limited as before), dynamic labels per division
+- Admin: division tagging on quote requests → leads → quotations → projects → gallery; division filter UI on quote requests; division-specific default task checklists on quotation→project conversion; "Divisions" editor in Settings (per-division tagline/description/services → `divisionsJson`, editable without code changes)
+- Schema: nullable `division` on QuoteRequest/Lead/Quotation/Project/GalleryItem; `CompanySettings.divisionsJson`
+- Tests: 73 assertions pass (incl. division validation + filter); lint clean; browser-verified incl. mobile
+
+Honesty notes unchanged: division service catalogues are default configurable content (Admin → Settings); no certifications/client names are fabricated anywhere.
 
 ---
 

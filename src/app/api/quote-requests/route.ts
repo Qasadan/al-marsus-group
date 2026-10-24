@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { handleRoute, ok, fail, requireAuth, rateLimit, getClientIp, ApiError, buildPagination } from "@/lib/api";
+import { handleRoute, ok, fail, requireAuth, parseBody, rateLimit, getClientIp, ApiError, buildPagination } from "@/lib/api";
 import { writeAudit, notifyAdmins } from "@/lib/audit";
 import { QUOTE_REQUEST_STATUSES, oneOf } from "@/lib/constants";
+import { DIVISION_CODES, divisionLabel } from "@/lib/divisions";
 
 // Public quotation request submission (website form)
 const submitSchema = z.object({
@@ -11,6 +12,7 @@ const submitSchema = z.object({
   email: z.string().email("A valid email is required").max(200),
   phone: z.string().min(7, "A valid phone number is required").max(30),
   address: z.string().max(300).optional().nullable(),
+  division: z.enum(DIVISION_CODES).optional().nullable(),
   propertyType: z.enum(["RESIDENTIAL", "COMMERCIAL", "INDUSTRIAL"]).default("RESIDENTIAL"),
   monthlyBill: z.string().max(50).optional().nullable(),
   message: z.string().max(3000).optional().nullable(),
@@ -48,7 +50,7 @@ export async function POST(req: NextRequest) {
     });
     await notifyAdmins(
       "New quotation request",
-      `${data.name} requested a solar quotation (${data.propertyType.toLowerCase()}).`,
+      `${data.name} requested a quotation${data.division ? ` for ${divisionLabel(data.division)}` : ""} (${data.propertyType.toLowerCase()}).`,
       "SYSTEM",
       "/admin/quote-requests"
     );
@@ -62,7 +64,11 @@ export async function GET(req: NextRequest) {
     await requireAuth(["quoterequests", "leads", "dashboard"]);
     const { page, pageSize, skip, take } = buildPagination(new URL(req.url).searchParams);
     const status = new URL(req.url).searchParams.get("status") ?? undefined;
-    const where = status ? { status } : {};
+    const division = new URL(req.url).searchParams.get("division") ?? undefined;
+    const where = {
+      ...(status ? { status } : {}),
+      ...(division ? { division } : {}),
+    };
     const [items, total] = await Promise.all([
       db.quoteRequest.findMany({ where, orderBy: { createdAt: "desc" }, skip, take }),
       db.quoteRequest.count({ where }),

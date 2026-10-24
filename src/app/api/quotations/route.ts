@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { handleRoute, ok, requireAuth, parseBody, buildPagination, ApiError } from "@/lib/api";
 import { writeAudit, notifyAdmins } from "@/lib/audit";
 import { QUOTATION_STATUSES, ITEM_KINDS, computeTotals, toCents, oneOf } from "@/lib/constants";
+import { DIVISION_CODES } from "@/lib/divisions";
 import { getSettings, generateDocNumber } from "@/lib/settings";
 
 // Quotation line item schema — unit prices supplied in display units (e.g. 15000.00),
@@ -20,6 +21,7 @@ const createSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
   surveyId: z.string().nullable().optional(),
   title: z.string().min(2, "Title is required").max(200),
+  division: z.enum(DIVISION_CODES).nullable().optional(),
   discount: z.number().nonnegative().default(0),
   taxRate: z.number().min(0).max(100).default(0),
   expiryDate: z.coerce.date().nullable().optional(),
@@ -87,6 +89,7 @@ export async function POST(req: NextRequest) {
         customerId: data.customerId,
         surveyId: data.surveyId ?? null,
         title: data.title,
+        division: data.division ?? null,
         issueDate: new Date(),
         expiryDate: data.expiryDate ?? null,
         currency: settings.currency,

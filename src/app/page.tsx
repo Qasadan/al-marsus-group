@@ -1,11 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sun, BatteryCharging, Wrench, ClipboardCheck, ShieldCheck, Leaf } from "lucide-react";
+import { ArrowRight, Zap, Cpu, HardHat, Snowflake, ShieldCheck, Users, Wrench } from "lucide-react";
 import { PublicShell } from "@/components/public/public-shell";
 import { getPublicSettings } from "@/lib/settings";
 import { db } from "@/lib/db";
+import { divisionLabel } from "@/lib/divisions";
 
 export const dynamic = "force-dynamic";
+
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
 
 export default async function HomePage() {
   const settings = await getPublicSettings();
@@ -14,23 +17,23 @@ export default async function HomePage() {
     orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
     take: 6,
   });
-  const services = settings.services.slice(0, 4);
+  const divisions = settings.divisions;
 
   return (
     <PublicShell>
-      {/* Hero */}
+      {/* Hero — group level */}
       <section className="brand-gradient text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-28">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6">
-              <Sun className="h-4 w-4" /> Solar Energy Solutions
+            <span className="inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6">
+              One Group · Four Specialised Divisions
             </span>
             <h1 className="text-4xl sm:text-5xl font-bold leading-tight">
-              {settings.heroTitle ?? "Power Your Future With Solar Energy"}
+              {settings.heroTitle ?? "Engineering, Digital, Operations & Cold Chain — Delivered by One Group"}
             </h1>
             <p className="mt-5 text-lg text-white/85 leading-relaxed">
               {settings.heroSubtitle ??
-                "Professional solar design, installation and maintenance for homes and businesses."}
+                "Al-Marsus Group Ltd serves homes and businesses through four specialised branches: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics."}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link
@@ -40,10 +43,10 @@ export default async function HomePage() {
                 Request a Free Quote <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/services"
+                href="/divisions"
                 className="inline-flex items-center justify-center gap-2 rounded-md border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
               >
-                Explore Services
+                Explore Our Divisions
               </Link>
             </div>
             <p className="mt-6 text-xs text-white/60">
@@ -54,32 +57,44 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Services */}
+      {/* Divisions — the four business branches */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[var(--brand-indigo)]">What We Do</h2>
+          <h2 className="text-3xl font-bold text-[var(--brand-indigo)]">Our Divisions</h2>
           <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-            End-to-end solar services — from the first site survey to years of reliable maintenance.
+            Four specialised branches, one accountable partner — each with its own engineering teams and service
+            catalogue.
           </p>
         </div>
-        {services.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {services.map((s, i) => (
-              <div key={i} className="rounded-xl border border-border bg-card p-6 hover:shadow-md transition-shadow">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {divisions.map((d) => {
+            const Icon = DIVISION_ICONS[d.icon];
+            return (
+              <Link
+                key={d.code}
+                href={`/divisions/${d.slug}`}
+                className="group flex flex-col rounded-xl border border-border bg-card p-6 hover:shadow-md transition-shadow"
+              >
                 <div className="mb-4 inline-flex rounded-lg bg-secondary p-3 text-[var(--brand-indigo)]">
-                  {i % 4 === 0 ? <Sun className="h-6 w-6" /> : i % 4 === 1 ? <BatteryCharging className="h-6 w-6" /> : i % 4 === 2 ? <Wrench className="h-6 w-6" /> : <ClipboardCheck className="h-6 w-6" />}
+                  <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-semibold mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground">{s.description}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center text-muted-foreground">Services will appear here once configured in Admin → Settings.</p>
-        )}
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--brand-green)]">
+                  {d.code === "MEP_ENGINEERING" ? "01" : d.code === "DIGITAL" ? "02" : d.code === "OPERATIONS_SERVICES" ? "03" : "04"}
+                </p>
+                <h3 className="mt-1 font-semibold text-[var(--brand-indigo)] group-hover:underline">
+                  {d.shortName}
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-3">{d.tagline}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-green)]">
+                  Learn more <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
-      {/* Why solar */}
+      {/* Why the group */}
       <section className="bg-muted">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
           <div className="grid gap-8 md:grid-cols-3">
@@ -87,21 +102,21 @@ export default async function HomePage() {
               <ShieldCheck className="h-8 w-8 text-[var(--brand-green)] shrink-0" />
               <div>
                 <h3 className="font-semibold mb-1">Quality Workmanship</h3>
-                <p className="text-sm text-muted-foreground">Professional installation with documented testing and handover records.</p>
+                <p className="text-sm text-muted-foreground">Documented testing, commissioning and handover records across every division.</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <Leaf className="h-8 w-8 text-[var(--brand-green)] shrink-0" />
+              <Users className="h-8 w-8 text-[var(--brand-green)] shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Clean Energy</h3>
-                <p className="text-sm text-muted-foreground">Reduce grid dependence and your carbon footprint with solar power.</p>
+                <h3 className="font-semibold mb-1">Skilled Teams</h3>
+                <p className="text-sm text-muted-foreground">Engineers, technicians and operators supervised under one accountable group.</p>
               </div>
             </div>
             <div className="flex gap-4">
-              <BatteryCharging className="h-8 w-8 text-[var(--brand-green)] shrink-0" />
+              <Wrench className="h-8 w-8 text-[var(--brand-green)] shrink-0" />
               <div>
-                <h3 className="font-semibold mb-1">Energy Independence</h3>
-                <p className="text-sm text-muted-foreground">Hybrid and backup systems sized to your consumption profile.</p>
+                <h3 className="font-semibold mb-1">Long-Term Support</h3>
+                <p className="text-sm text-muted-foreground">From installation to maintenance contracts — we stay after handover.</p>
               </div>
             </div>
           </div>
@@ -133,6 +148,11 @@ export default async function HomePage() {
                   />
                 </div>
                 <div className="p-4">
+                  {item.division && (
+                    <span className="mb-1.5 inline-block rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">
+                      {divisionLabel(item.division)}
+                    </span>
+                  )}
                   <h3 className="font-medium">{item.title}</h3>
                   {(item.location || item.capacityKw) && (
                     <p className="text-sm text-muted-foreground mt-1">
@@ -145,7 +165,7 @@ export default async function HomePage() {
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-            No published projects yet. Company administrators can publish completed installations in Admin → Gallery.
+            No published projects yet. Company administrators can publish completed work in Admin → Gallery.
           </div>
         )}
       </section>
@@ -153,9 +173,10 @@ export default async function HomePage() {
       {/* CTA */}
       <section className="brand-gradient-green text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14 text-center">
-          <h2 className="text-3xl font-bold">Ready to go solar?</h2>
+          <h2 className="text-3xl font-bold">Have a project in mind?</h2>
           <p className="mt-3 text-white/85 max-w-xl mx-auto">
-            Request a quotation and our team will schedule a site survey to assess your energy needs.
+            Request a quotation and the right division will get back to you — solar and MEP, digital, operations or
+            cold chain.
           </p>
           <Link
             href="/quote"

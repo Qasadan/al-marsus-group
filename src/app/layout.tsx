@@ -18,16 +18,19 @@ export async function generateMetadata(): Promise<Metadata> {
   // per page where needed) to keep the root layout resilient.
   return {
     title: {
-      default: "Al-Marsus Group Ltd — Solar Energy Solutions",
+      default: "Al-Marsus Group Ltd — Engineering · Digital · Operations · Cold Chain",
       template: "%s | Al-Marsus Group Ltd",
     },
     description:
-      "Al-Marsus Group Ltd — professional solar energy installation, maintenance and energy solutions for homes and businesses.",
-    keywords: ["solar energy", "solar installation", "Al-Marsus Group", "photovoltaic", "renewable energy"],
+      "Al-Marsus Group Ltd — a multi-division engineering and services group: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics.",
+    keywords: [
+      "Al-Marsus Group", "MEP engineering", "solar energy", "solar installation",
+      "digital solutions", "operations services", "cold chain storage", "logistics", "renewable energy",
+    ],
     icons: { icon: "/images/logo.jpg" },
     openGraph: {
-      title: "Al-Marsus Group Ltd — Solar Energy Solutions",
-      description: "Professional solar energy installation and maintenance services.",
+      title: "Al-Marsus Group Ltd — Engineering · Digital · Operations · Cold Chain",
+      description: "One group, four specialised divisions: MEP Engineering, Digital, Operations Services and Cold Chain Storage & Logistics.",
       siteName: "Al-Marsus Group Ltd",
       type: "website",
     },

@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: "Contact Al-Marsus Group Ltd for solar installations, support and quotations.",
+  description: "Contact Al-Marsus Group Ltd for quotations, support and general enquiries across all four divisions.",
 };
 
 export default async function ContactPage() {
@@ -69,7 +69,7 @@ export default async function ContactPage() {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Response time</p>
-              <p className="font-medium">Quotation requests are reviewed by our team and you will be contacted to schedule a site survey.</p>
+              <p className="font-medium">Quotation requests are reviewed by our team and routed to the relevant division, which will contact you with the next steps.</p>
             </div>
           </div>
         </div>

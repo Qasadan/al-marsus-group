@@ -18,15 +18,48 @@ const convertSchema = z.object({
   defaultTasks: z.array(z.string().min(1).max(200)).max(30).optional(),
 });
 
-const DEFAULT_TASKS = [
-  "Site preparation and safety setup",
-  "Mounting structure installation",
-  "Panel installation",
-  "Inverter and wiring installation",
-  "Battery installation (if applicable)",
-  "System testing and commissioning",
-  "Customer handover and documentation",
-];
+const DEFAULT_TASKS: Record<string, string[]> = {
+  MEP_ENGINEERING: [
+    "Site preparation and safety setup",
+    "Materials and equipment delivery to site",
+    "Mounting structure installation",
+    "Panel installation",
+    "Inverter and wiring installation",
+    "System testing and commissioning",
+    "Customer handover and documentation",
+  ],
+  DIGITAL: [
+    "Requirements review and sign-off",
+    "Environment and access setup",
+    "Development / configuration work",
+    "Internal testing and quality checks",
+    "User acceptance testing with customer",
+    "Deployment and go-live",
+    "Training and handover documentation",
+  ],
+  OPERATIONS_SERVICES: [
+    "Site handover and access arrangements",
+    "Maintenance schedule and checklist setup",
+    "Technician assignment and briefing",
+    "First service visit execution",
+    "Reporting cadence agreed with customer",
+    "Ongoing operations monitoring",
+    "Review meeting and documentation",
+  ],
+  COLD_CHAIN: [
+    "Site preparation and safety setup",
+    "Cold room structure and insulation installation",
+    "Refrigeration unit installation",
+    "Electrical hookup and controls setup",
+    "Temperature pull-down testing and commissioning",
+    "Monitoring and alarm configuration",
+    "Customer handover and documentation",
+  ],
+};
+
+function defaultTasksFor(division: string | null | undefined): string[] {
+  return DEFAULT_TASKS[division ?? ""] ?? DEFAULT_TASKS.MEP_ENGINEERING;
+}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   return handleRoute(async () => {
@@ -46,6 +79,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         data: {
           code,
           name: data.name ?? quotation.title,
+          division: quotation.division ?? null,
           customerId: quotation.customerId,
           quotationId: quotation.id,
           status: "PLANNING",
@@ -58,7 +92,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           warrantyMonths: data.warrantyMonths ?? null,
           createdById: session.sub,
           tasks: {
-            create: (data.defaultTasks ?? DEFAULT_TASKS).map((title, i) => ({
+            create: (data.defaultTasks ?? defaultTasksFor(quotation.division)).map((title, i) => ({
               title,
               sortOrder: i,
             })),
