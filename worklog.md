@@ -94,3 +94,21 @@ Work Log:
 
 Stage Summary:
 - Production build verified: exit 0 + standalone artifact + 200-level smoke test on all key pages with four-division content present. Only external items remain (Supabase/PostgreSQL migration, real secrets, company settings). Project ready for deployment pipeline.
+
+---
+Task ID: 11
+Agent: main
+Task: User-requested live run & check — found and fixed production-only login failure, captured screenshot evidence
+
+Work Log:
+- Sandbox had resumed inactive; nothing on :3000 (confirmed processes spawned from tool calls are reaped at call boundaries; platform boot supervisor is the only persistent launcher)
+- Booted verified standalone build in-call; browser-verified public pages: titles correct (home tagline "Engineering · Digital · Operations · Cold Chain", /divisions, /divisions/mep-engineering, /quote, /login), zero page errors
+- Discovered POST /api/auth/login → 500 in production build ("JWT_SECRET must be set in production") — dev fallback masked it; the platform publish pipeline (build.sh → start.sh) sets no JWT_SECRET, so a published deploy would have broken login
+- Root cause: getSecret() hard-threw in production without JWT_SECRET; Edge middleware shares the same secret path (also would have failed)
+- Fix (runtime provisioning, no app code change): JWT_SECRET added to sandbox .env; .zscripts/start.sh (packaged into every deploy by build.sh line 158) now auto-generates a random secret persisted to <db-dir>/.jwt-secret (chmod 600) when none is injected — injected env always takes precedence; db/.jwt-secret gitignored
+- Verification after fix: login 200 + Set-Cookie; Edge middleware accepted session (/admin rendered dashboard, no redirect); FULL 73-assertion E2E suite re-run against the production standalone build: 73 passed / 0 failed
+- Authenticated browser screenshots captured: /admin dashboard (real aggregates, KES figures), /admin/quotations, mobile divisions — saved to download/preview/ (9 images incl. desktop + mobile public pages)
+- Updated docs/DEPLOYMENT.md (auto-provision note) and docs/PROJECT_STATUS.md (bug #6, prod-E2E row, remaining tasks)
+
+Stage Summary:
+- Live run confirmed working end-to-end in production mode, including authenticated admin. One real prod-only bug found and fixed. Screenshot evidence in download/preview/. Committed.

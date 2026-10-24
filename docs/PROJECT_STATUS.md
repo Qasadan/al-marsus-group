@@ -1,7 +1,7 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
 Last updated: 2026-10-25 (production-build verification session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox. Four-branch group expansion (Task 9) complete — the site presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only. Production build now verified (Task 10): `bun run build` exits 0, standalone bundle produced, production smoke test passed.**
+Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete — the site presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only. Production build now verified (Task 10): `bun run build` exits 0, standalone bundle produced, production smoke test passed.**
 
 ---
 
@@ -85,7 +85,7 @@ Honesty notes unchanged: division service catalogues are default configurable co
 | `bun run db:push` | ✅ schema in sync, client generated (v6.19.2) |
 | `bun prisma/seed.ts` | ✅ settings + super admin created (dev fallback creds, documented) |
 | `bun run lint` | ✅ clean (re-run 2026-10-25: 0 errors / 0 warnings) |
-| `bun scripts/api-tests.ts` | ✅ **73 passed, 0 failed** (re-run 2026-10-25 after Task 9 expansion) |
+| `bun scripts/api-tests.ts` | ✅ **73 passed, 0 failed** (re-run 2026-10-25 after Task 9 expansion; re-run again **against the production standalone build** on 2026-10-25 — same result) |
 | `curl /api/health` | ✅ healthy, database connected |
 | `bun run build` (Task 10, 2026-10-25) | ✅ **exit 0** — all public pages, API routes, admin pages, print views and middleware compiled; `.next/standalone/server.js` produced with static assets copied |
 | Production smoke test (standalone on :3001) | ✅ `/api/health` healthy + DB connected; `/`, `/divisions`, `/divisions/mep-engineering`, `/quote`, `/services`, `/login` all HTTP 200; home HTML contains "Our Divisions", "MEP Engineering", "Cold Chain" |
@@ -98,11 +98,12 @@ Honesty notes unchanged: division service catalogues are default configurable co
 3. Print pages used `onClick` in Server Components — extracted `PrintButton` client component.
 4. React lint `set-state-in-effect` in dialogs — refactored to remount pattern.
 5. Missing `Select` imports in gallery page.
+6. **Production-only login 500** (found 2026-10-25 during live prod smoke test): `getSecret()` threw "JWT_SECRET must be set in production" — dev used a fallback, prod had none, and the platform deploy pipeline sets no `JWT_SECRET`. Fixed at runtime-provisioning level (no app-code change): real `JWT_SECRET` added to sandbox `.env`; bundled `start.sh` now auto-generates and persists a random secret to `<db-dir>/.jwt-secret` (0600) when none is injected. Verified: login 200 + Set-Cookie; Edge middleware accepts the session (`/admin` renders dashboard).
 
 ## 4. Remaining tasks (external to sandbox)
 
 1. Provision PostgreSQL (Supabase), switch datasource provider, run `prisma migrate dev` to generate versioned SQL migrations, `prisma db push`/deploy.
-2. Set real `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`; run seed; **change admin password after first login**.
+2. Set real `ADMIN_EMAIL`, `ADMIN_PASSWORD`; run seed; **change admin password after first login**. (`JWT_SECRET` is auto-provisioned by `start.sh` if not injected, but an explicit value is still recommended.)
 3. Configure company settings (contact details, about text, division service catalogues, terms, currency, tax rate) in Admin → Settings.
 4. Optional hardening: object storage for uploads, Redis rate-limiting, email/SMS provider, server-side PDF rendering, monitoring/logging aggregation.
 5. Schedule DB backups per DEPLOYMENT.md §7 and verify a restore.

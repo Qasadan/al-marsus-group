@@ -77,6 +77,24 @@ if [ -f "./next-service-dist/server.js" ]; then
     export HOSTNAME="${HOSTNAME:-0.0.0.0}"
     export DATABASE_URL="${DATABASE_URL:-$DEFAULT_PACKAGED_DATABASE_URL}"
 
+    # 会话签名密钥：优先使用外部注入的 JWT_SECRET；否则在数据库同目录
+    # 生成并持久化一个随机密钥（首次启动生成，重启复用，不进代码库）。
+    # 这样部署包无需人工配置即可正常登录；正式环境仍建议显式注入 JWT_SECRET。
+    if [ -z "${JWT_SECRET:-}" ]; then
+        SECRET_FILE="$(dirname "$DEFAULT_PACKAGED_DB_PATH")/.jwt-secret"
+        if [ -f "$SECRET_FILE" ] && [ "$(wc -c < "$SECRET_FILE")" -ge 32 ]; then
+            JWT_SECRET="$(cat "$SECRET_FILE")"
+            echo "🔐 使用已持久化的 JWT_SECRET: $SECRET_FILE"
+        else
+            JWT_SECRET="$(head -c 48 /dev/urandom | base64 | tr -d '\n')"
+            mkdir -p "$(dirname "$SECRET_FILE")"
+            printf '%s' "$JWT_SECRET" > "$SECRET_FILE"
+            chmod 600 "$SECRET_FILE" 2>/dev/null || true
+            echo "🔐 已生成并持久化 JWT_SECRET: $SECRET_FILE"
+        fi
+        export JWT_SECRET
+    fi
+
     if [ "$DATABASE_URL" = "$DEFAULT_PACKAGED_DATABASE_URL" ]; then
         if [ ! -f "$DEFAULT_PACKAGED_DB_PATH" ]; then
             echo "❌ 未找到打包后的数据库文件 $DEFAULT_PACKAGED_DB_PATH"

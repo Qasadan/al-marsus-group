@@ -50,6 +50,8 @@ NODE_ENV="production"
 - The seed **refuses to run in production** without `ADMIN_EMAIL`/`ADMIN_PASSWORD` (no undocumented backdoor accounts).
 - Never expose `JWT_SECRET` or DB credentials to the browser — all privileged code runs server-side.
 
+- If `JWT_SECRET` is not injected, the bundled `start.sh` boot script auto-generates a random secret and persists it to `<db-dir>/.jwt-secret` (file permissions 0600) so the first deployment works without manual setup and sessions survive restarts. For serious deployments, still inject an explicit `JWT_SECRET` per the checklist below — an injected value always takes precedence.
+
 ## 4. Initial seed & first login
 
 ```bash
