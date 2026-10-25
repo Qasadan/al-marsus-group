@@ -128,3 +128,22 @@ Work Log:
 
 Stage Summary:
 - Admin login works in the user's actual preview context; only the session-cookie attributes changed (commit 8b8f3ff). Evidence: download/preview/10-login-works-admin.png, 11-iframe-embed-login-fixed.png
+
+---
+Task ID: 13
+Agent: main
+Task: User request — more attractive/minimal/clean UI-UX + dark mode (constraint: change nothing else)
+
+Work Log:
+- Dark-mode infrastructure completed: ThemeProvider (next-themes, class strategy, system default) in root layout; new ThemeToggle (useSyncExternalStore mounted-guard to satisfy react-hooks/set-state-in-effect) in header desktop + mobile
+- globals.css: refined tokens (radius 0.75rem; dark palette deepened: bg #0d0e1d, card #14152a, primary #8b8de3, green accents brightened #4ecb8d via --brand-green-bright); new utilities: .eyebrow, .card-hover (lift+shadow+border tint, dark-aware), .hero-glow / .hero-glow-green (radial decorative glows)
+- site-header: glass backdrop (bg-background/80 + blur), rounded-full nav pills, theme toggle in both navs, bg-white -> bg-background, green links get dark bright variant
+- site-footer: dark variant bg #0a0b1a
+- Home: hero glow + dot badge + larger tracking-tight headline + pill CTAs with green shadow; division/why/projects cards rounded-2xl + card-hover; eyebrow section labels; CTA glow
+- Token sweep on public pages only (about/services/projects/contact/privacy/divisions/division-detail/login): text-[var(--brand-indigo)] -> text-primary (dark-contrast safe), green text gets dark bright variant
+- login: card bg-white -> bg-card + border (dark-aware); quote-form + login error boxes get dark red variants
+- Admin/portal/print untouched (per user constraint); admin inherits dark tokens automatically, print views unaffected
+- Verification: lint clean (fixed set-state-in-effect via useSyncExternalStore); api-tests 73/73 (functionality unchanged); browser: toggle flips html.dark, localStorage persists across reload, dark screenshots (desktop home full, mobile 390x844, division detail, quote, login) + refreshed light home
+
+Stage Summary:
+- Public site restyled minimal/clean with working, persisted dark mode; zero functional changes; evidence in download/preview/12-17
