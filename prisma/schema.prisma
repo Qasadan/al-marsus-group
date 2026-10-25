@@ -576,6 +576,7 @@ model CompanySettings {
   tagline              String?
   heroTitle            String?
   heroSubtitle         String?
+  heroJson             String? // JSON hero extras: badge, CTA labels/links, footnote (no-code hero editor)
   aboutText            String?
   missionText          String?
   visionText           String?

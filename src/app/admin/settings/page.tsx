@@ -13,6 +13,8 @@ import { toast } from "@/hooks/use-toast";
 
 interface SettingsShape {
   companyName: string; tagline: string; heroTitle: string; heroSubtitle: string;
+  heroBadge: string; heroPrimaryCtaLabel: string; heroPrimaryCtaHref: string;
+  heroSecondaryCtaLabel: string; heroSecondaryCtaHref: string; heroNote: string;
   aboutText: string; missionText: string; visionText: string;
   email: string; phone: string; whatsappNumber: string; address: string;
   currency: string; taxRate: string;
@@ -32,9 +34,17 @@ export default function SettingsPage() {
 
   useEffect(() => {
     api<Record<string, unknown>>("/api/settings").then((d) => {
+      const hero = (d.hero ?? {}) as Record<string, unknown>;
       setForm({
         companyName: d.companyName ?? "", tagline: d.tagline ?? "", heroTitle: d.heroTitle ?? "",
-        heroSubtitle: d.heroSubtitle ?? "", aboutText: d.aboutText ?? "", missionText: d.missionText ?? "",
+        heroSubtitle: d.heroSubtitle ?? "",
+        heroBadge: hero.badge ?? "",
+        heroPrimaryCtaLabel: hero.primaryCtaLabel ?? "",
+        heroPrimaryCtaHref: hero.primaryCtaHref ?? "",
+        heroSecondaryCtaLabel: hero.secondaryCtaLabel ?? "",
+        heroSecondaryCtaHref: hero.secondaryCtaHref ?? "",
+        heroNote: hero.note ?? "",
+        aboutText: d.aboutText ?? "", missionText: d.missionText ?? "",
         visionText: d.visionText ?? "", email: d.email ?? "", phone: d.phone ?? "",
         whatsappNumber: d.whatsappNumber ?? "", address: d.address ?? "", currency: d.currency ?? "KES",
         taxRate: String(d.taxRate ?? 16), quotationPrefix: d.quotationPrefix ?? "QT",
@@ -74,6 +84,14 @@ export default function SettingsPage() {
           tagline: form.tagline || null,
           heroTitle: form.heroTitle || null,
           heroSubtitle: form.heroSubtitle || null,
+          hero: {
+            badge: form.heroBadge || null,
+            primaryCtaLabel: form.heroPrimaryCtaLabel || null,
+            primaryCtaHref: form.heroPrimaryCtaHref || null,
+            secondaryCtaLabel: form.heroSecondaryCtaLabel || null,
+            secondaryCtaHref: form.heroSecondaryCtaHref || null,
+            note: form.heroNote || null,
+          },
           aboutText: form.aboutText || null,
           missionText: form.missionText || null,
           visionText: form.visionText || null,
@@ -132,14 +150,80 @@ export default function SettingsPage() {
               <Label htmlFor="s-tagline">Tagline</Label>
               <Input id="s-tagline" value={form.tagline} onChange={(e) => set({ tagline: e.target.value })} />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="s-hero">Homepage hero title</Label>
-              <Input id="s-hero" value={form.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
+          </div>
+
+          {/* No-code homepage hero editor */}
+          <div className="rounded-lg border border-border p-5 space-y-4">
+            <div>
+              <h3 className="font-semibold">Homepage hero section</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Edit the public homepage hero here — no code required. The preview updates as you type; blank fields use
+                the built-in defaults.
+              </p>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="s-herosub">Homepage hero subtitle</Label>
-              <Textarea id="s-herosub" rows={2} value={form.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
+            {/* Live preview */}
+            <div className="brand-gradient hero-glow rounded-xl p-5 text-white overflow-hidden" aria-hidden="true">
+              {form.heroBadge && (
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium mb-3 ring-1 ring-white/20">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" />
+                  {form.heroBadge}
+                </span>
+              )}
+              <p className="text-lg font-bold leading-snug tracking-tight line-clamp-2">
+                {form.heroTitle || "Your hero title appears here"}
+              </p>
+              <p className="mt-1.5 text-xs text-white/80 line-clamp-2">
+                {form.heroSubtitle || "Your hero subtitle appears here."}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3.5 py-1.5 text-xs font-semibold">
+                  {form.heroPrimaryCtaLabel || "Request a Free Quote"}
+                </span>
+                <span className="inline-flex items-center rounded-full border border-white/40 px-3.5 py-1.5 text-xs font-semibold">
+                  {form.heroSecondaryCtaLabel || "Explore Our Divisions"}
+                </span>
+              </div>
+              {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
             </div>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="space-y-1.5 lg:col-span-2">
+                <Label htmlFor="s-hero-badge">Badge (small pill above the title)</Label>
+                <Input id="s-hero-badge" value={form.heroBadge} placeholder="One Group · Four Specialised Divisions" onChange={(e) => set({ heroBadge: e.target.value })} />
+              </div>
+              <div className="space-y-1.5 lg:col-span-2">
+                <Label htmlFor="s-hero">Title</Label>
+                <Input id="s-hero" value={form.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
+              </div>
+              <div className="space-y-1.5 lg:col-span-2">
+                <Label htmlFor="s-herosub">Subtitle</Label>
+                <Textarea id="s-herosub" rows={2} value={form.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="s-hero-cta1">Primary button text</Label>
+                <Input id="s-hero-cta1" value={form.heroPrimaryCtaLabel} placeholder="Request a Free Quote" onChange={(e) => set({ heroPrimaryCtaLabel: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="s-hero-cta1-link">Primary button link</Label>
+                <Input id="s-hero-cta1-link" value={form.heroPrimaryCtaHref} placeholder="/quote" onChange={(e) => set({ heroPrimaryCtaHref: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="s-hero-cta2">Secondary button text</Label>
+                <Input id="s-hero-cta2" value={form.heroSecondaryCtaLabel} placeholder="Explore Our Divisions" onChange={(e) => set({ heroSecondaryCtaLabel: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="s-hero-cta2-link">Secondary button link</Label>
+                <Input id="s-hero-cta2-link" value={form.heroSecondaryCtaHref} placeholder="/divisions" onChange={(e) => set({ heroSecondaryCtaHref: e.target.value })} />
+              </div>
+              <div className="space-y-1.5 lg:col-span-2">
+                <Label htmlFor="s-hero-note">Small note under the buttons (optional)</Label>
+                <Textarea id="s-hero-note" rows={2} value={form.heroNote} onChange={(e) => set({ heroNote: e.target.value })} />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Button links can be a page path (e.g. <code>/quote</code>, <code>/divisions</code>), a section anchor
+              (<code>#services</code>) or a full link (<code>https://…</code>, <code>mailto:…</code>, <code>tel:…</code>).
+              Leave a button text blank to hide that button.
+            </p>
           </div>
 
           <div className="rounded-lg border border-border p-5 space-y-4">

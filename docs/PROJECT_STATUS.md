@@ -1,7 +1,7 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
-Last updated: 2026-10-25 (production-build verification session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete — the site presents MEP Engineering, Digital, Operations Services and Cold Chain instead of solar-only. Production build now verified (Task 10): `bun run build` exits 0, standalone bundle produced, production smoke test passed.**
+Last updated: 2026-10-25 (UI/UX refresh + dark mode + cursor glow + no-code hero editor session)
+Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete. Production build verified (Task 10). Preview-panel login fixed (Task 12). Public site restyled minimal/clean with persisted dark mode (Task 13). Cursor border-glow animations + no-code homepage hero editor in Admin → Settings delivered (Task 14); 73/73 E2E, lint clean, browser-verified in light & dark, desktop & mobile.**
 
 ---
 
@@ -23,6 +23,25 @@ What was built:
 - Tests: 73 assertions pass (incl. division validation + filter); lint clean; browser-verified incl. mobile
 
 Honesty notes unchanged: division service catalogues are default configurable content (Admin → Settings); no certifications/client names are fabricated anywhere.
+
+---
+
+## 0b. Cursor glow + no-code hero editor (Task 14) ✅
+
+**Cursor glow system** (`globals.css`, brand green ↔ indigo, `prefers-reduced-motion`-aware, disabled in print):
+- Universal animated "breathe" glow on hover for every interactive element (links, buttons, inputs, selects, textareas, menu items) — gated by `@media (hover: hover)` so touch devices are unaffected
+- Keyboard `:focus-visible` glow (outline + brand-green halo) on all interactive elements — not media-gated
+- Premium `.glow-border` utility: rotating conic-gradient "comet" border sweep on hover/focus (applied to hero CTAs, header CTA, division cards), behind an `@supports (mask-composite)` guard so unsupported browsers just skip the ring
+- `.card-hover` and `.glow-soft` extended with matching brand glow; Radix menu items glow when keyboard-highlighted
+
+**No-code hero editor** (Admin → Settings → "Homepage hero section"):
+- `CompanySettings.heroJson` (Prisma schema + db:push applied) stores badge, primary/secondary CTA labels + links, footnote; hero title/subtitle remain dedicated columns — all editable in the admin with a **live gradient preview** that updates as you type; blank fields fall back to built-in defaults
+- `PUT /api/settings` accepts a validated `hero` object (links must be `/…`, `#…`, `http(s)://…`, `mailto:…`, `tel:…` — `javascript:` and other schemes rejected 422); GET returns parsed `hero`
+- Homepage renders every hero string from settings; zero code required to reword/relink the hero
+- Implementation note: hero JSON is read/written via **parameterized raw SQL** (`readHeroJson`/`writeHeroJson` in `src/lib/settings.ts`) so any Prisma client generation can serve it — including a long-running dev server whose client predates the column; typed Prisma field remains in the schema for future client generations
+- Verified end-to-end in the browser: admin edit → Save All → homepage reflects changes (badge/CTA/note), hero:null reset restores defaults
+
+Evidence: `download/preview/18–31` (light/dark × desktop/mobile glow states, CTA/card/input glow, admin hero editor + live preview, customized hero rendering, defaults restored).
 
 ---
 

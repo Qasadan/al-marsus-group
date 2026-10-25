@@ -18,42 +18,50 @@ export default async function HomePage() {
     take: 6,
   });
   const divisions = settings.divisions;
+  // No-code hero content — every value is admin-editable (Admin → Settings → Homepage hero).
+  const hero = settings.hero;
+  const heroTitle = settings.heroTitle ?? "Engineering, Digital, Operations & Cold Chain — Delivered by One Group";
+  const heroSubtitle =
+    settings.heroSubtitle ??
+    "Al-Marsus Group Ltd serves homes and businesses through four specialised branches: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics.";
+  const heroBadge = hero.badge ?? "One Group · Four Specialised Divisions";
+  const primaryCta = { label: hero.primaryCtaLabel ?? "Request a Free Quote", href: hero.primaryCtaHref ?? "/quote" };
+  const secondaryCta = { label: hero.secondaryCtaLabel ?? "Explore Our Divisions", href: hero.secondaryCtaHref ?? "/divisions" };
+  const heroNote =
+    hero.note ??
+    "Website content is managed by the company via the admin panel — sections marked as placeholders are pending official information.";
 
   return (
     <PublicShell>
-      {/* Hero — group level */}
+      {/* Hero — group level (content editable in Admin → Settings, no code required) */}
       <section className="brand-gradient hero-glow text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-28">
           <div className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6 ring-1 ring-white/20 backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" aria-hidden="true" />
-              One Group · Four Specialised Divisions
-            </span>
+            {heroBadge && (
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6 ring-1 ring-white/20 backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" aria-hidden="true" />
+                {heroBadge}
+              </span>
+            )}
             <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold leading-[1.08] tracking-tight">
-              {settings.heroTitle ?? "Engineering, Digital, Operations & Cold Chain — Delivered by One Group"}
+              {heroTitle}
             </h1>
-            <p className="mt-6 text-lg text-white/85 leading-relaxed">
-              {settings.heroSubtitle ??
-                "Al-Marsus Group Ltd serves homes and businesses through four specialised branches: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics."}
-            </p>
+            <p className="mt-6 text-lg text-white/85 leading-relaxed">{heroSubtitle}</p>
             <div className="mt-9 flex flex-col sm:flex-row gap-3">
               <Link
-                href="/quote"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00A651]/25 hover:bg-[var(--brand-green-dark)] transition-colors"
+                href={primaryCta.href}
+                className="glow-border inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00A651]/25 hover:bg-[var(--brand-green-dark)] transition-colors"
               >
-                Request a Free Quote <ArrowRight className="h-4 w-4" />
+                {primaryCta.label} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/divisions"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+                href={secondaryCta.href}
+                className="glow-border inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
               >
-                Explore Our Divisions
+                {secondaryCta.label}
               </Link>
             </div>
-            <p className="mt-8 text-xs text-white/60">
-              Website content is managed by the company via the admin panel — sections marked as placeholders are
-              pending official information.
-            </p>
+            <p className="mt-8 text-xs text-white/60">{heroNote}</p>
           </div>
         </div>
       </section>
@@ -75,7 +83,7 @@ export default async function HomePage() {
               <Link
                 key={d.code}
                 href={`/divisions/${d.slug}`}
-                className="group flex flex-col rounded-2xl border border-border/70 bg-card p-6 card-hover"
+                className="group glow-border flex flex-col rounded-2xl border border-border/70 bg-card p-6 card-hover"
               >
                 <div className="mb-5 inline-flex w-fit rounded-xl bg-secondary p-3 text-primary">
                   <Icon className="h-6 w-6" />
@@ -100,7 +108,7 @@ export default async function HomePage() {
       <section className="bg-muted/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
           <div className="grid gap-5 md:grid-cols-3">
-            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6">
+            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6 glow-soft">
               <div className="inline-flex h-fit rounded-xl bg-secondary p-2.5 text-primary shrink-0">
                 <ShieldCheck className="h-5 w-5" />
               </div>
@@ -109,7 +117,7 @@ export default async function HomePage() {
                 <p className="text-sm text-muted-foreground">Documented testing, commissioning and handover records across every division.</p>
               </div>
             </div>
-            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6">
+            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6 glow-soft">
               <div className="inline-flex h-fit rounded-xl bg-secondary p-2.5 text-primary shrink-0">
                 <Users className="h-5 w-5" />
               </div>
@@ -118,7 +126,7 @@ export default async function HomePage() {
                 <p className="text-sm text-muted-foreground">Engineers, technicians and operators supervised under one accountable group.</p>
               </div>
             </div>
-            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6">
+            <div className="flex gap-4 rounded-2xl border border-border/70 bg-card p-6 glow-soft">
               <div className="inline-flex h-fit rounded-xl bg-secondary p-2.5 text-primary shrink-0">
                 <Wrench className="h-5 w-5" />
               </div>
@@ -146,7 +154,7 @@ export default async function HomePage() {
         {gallery.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {gallery.map((item) => (
-              <div key={item.id} className="group rounded-2xl overflow-hidden border border-border/70 bg-card card-hover">
+              <div key={item.id} className="group glow-soft rounded-2xl overflow-hidden border border-border/70 bg-card card-hover">
                 <div className="relative aspect-[4/3] bg-muted">
                   <Image
                     src={item.imageUrl}

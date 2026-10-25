@@ -172,11 +172,17 @@
 }
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px -12px rgba(38, 40, 110, 0.18);
-  border-color: color-mix(in srgb, var(--brand-indigo) 25%, var(--border));
+  box-shadow:
+    0 12px 32px -12px rgba(38, 40, 110, 0.18),
+    0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 20%, transparent),
+    0 0 20px -6px color-mix(in srgb, var(--brand-green-bright) 28%, transparent);
+  border-color: color-mix(in srgb, var(--brand-green-bright) 32%, var(--border));
 }
 .dark .card-hover:hover {
-  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.55);
+  box-shadow:
+    0 12px 32px -12px rgba(0, 0, 0, 0.55),
+    0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 28%, transparent),
+    0 0 22px -6px color-mix(in srgb, var(--brand-green-bright) 34%, transparent);
   border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
 }
 
@@ -204,6 +210,167 @@
     radial-gradient(620px 320px at 92% 110%, rgba(38, 40, 110, 0.35), transparent 60%);
 }
 
+/* ============================================================
+   Cursor glow system — every interactive element lights up
+   where the cursor touches it (brand green <-> indigo pulse)
+   ============================================================ */
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Transition groundwork so glow states ease in smoothly */
+a,
+button,
+[role="button"],
+[role="menuitem"],
+input,
+select,
+textarea,
+summary,
+.card-hover,
+.glow-soft {
+  transition-property: color, background-color, border-color, box-shadow, text-shadow, transform, opacity, filter;
+  transition-duration: 220ms;
+  transition-timing-function: ease;
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 28%, transparent),
+      0 0 14px -2px color-mix(in srgb, var(--brand-green-bright) 30%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--primary) 42%, transparent),
+      0 0 24px 0 color-mix(in srgb, var(--primary) 38%, transparent);
+  }
+}
+
+/* Hover glow — universal, subtle, animated */
+@media (hover: hover) {
+  a:hover,
+  button:not(:disabled):hover,
+  [role="button"]:hover,
+  [role="menuitem"]:hover,
+  input:not(:disabled):hover,
+  select:not(:disabled):hover,
+  textarea:not(:disabled):hover,
+  summary:hover,
+  .glow-soft:hover {
+    border-color: color-mix(in srgb, var(--brand-green-bright) 45%, var(--border));
+    text-shadow: 0 0 16px color-mix(in srgb, var(--brand-green-bright) 30%, transparent);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  a:hover,
+  button:not(:disabled):hover,
+  [role="button"]:hover,
+  [role="menuitem"]:hover,
+  input:not(:disabled):hover,
+  select:not(:disabled):hover,
+  textarea:not(:disabled):hover,
+  summary:hover,
+  .glow-soft:hover {
+    animation: glow-breathe 1.9s ease-in-out infinite;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  a:hover,
+  button:not(:disabled):hover,
+  [role="button"]:hover,
+  [role="menuitem"]:hover,
+  input:not(:disabled):hover,
+  select:not(:disabled):hover,
+  textarea:not(:disabled):hover,
+  summary:hover,
+  .glow-soft:hover {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 28%, transparent),
+      0 0 16px -2px color-mix(in srgb, var(--brand-green-bright) 32%, transparent);
+  }
+}
+
+/* Keyboard focus glow (accessible + animated-free) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[role="menuitem"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+.glow-soft:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand-green-bright) 60%, transparent);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 35%, transparent),
+    0 0 20px -2px color-mix(in srgb, var(--brand-green-bright) 40%, transparent);
+}
+
+/* Radix menu items highlighted via keyboard navigation */
+@media (prefers-reduced-motion: no-preference) {
+  [role="menuitem"][data-highlighted="true"] {
+    animation: glow-breathe 1.9s ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [role="menuitem"][data-highlighted="true"] {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 28%, transparent),
+      0 0 16px -2px color-mix(in srgb, var(--brand-green-bright) 32%, transparent);
+  }
+}
+
+/* Premium rotating border glow — apply .glow-border to hero CTAs & feature cards.
+   A brand-colored comet sweeps around the border while hovered/focused. */
+.glow-border {
+  position: relative;
+}
+@supports (mask-composite: exclude) or (-webkit-mask-composite: xor) {
+  .glow-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--glow-angle),
+      transparent 0deg,
+      transparent 275deg,
+      color-mix(in srgb, var(--brand-green-bright) 85%, transparent) 312deg,
+      color-mix(in srgb, var(--primary) 85%, transparent) 344deg,
+      transparent 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .glow-border:hover::after,
+  .glow-border:focus-visible::after {
+    opacity: 1;
+    animation: glow-spin 3s linear infinite;
+  }
+}
+@keyframes glow-spin {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-border:hover::after,
+  .glow-border:focus-visible::after {
+    animation: none;
+  }
+}
+
 /* Print styles for quotation/invoice print views */
 @media print {
   .no-print {
@@ -219,4 +386,21 @@
     padding: 0 !important;
     max-width: 100% !important;
   }
+  /* Glows must never appear on printed documents */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  summary,
+  .card-hover,
+  .glow-soft,
+  .glow-border,
+  .glow-border::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+  }
 }
+
+/* glow system v2 */

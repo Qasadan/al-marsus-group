@@ -147,3 +147,20 @@ Work Log:
 
 Stage Summary:
 - Public site restyled minimal/clean with working, persisted dark mode; zero functional changes; evidence in download/preview/12-17
+
+---
+Task ID: 14
+Agent: main
+Task: User request — cursor border-glow animations everywhere + no-code hero section customization in admin
+
+Work Log:
+- Glow system in globals.css: @property --glow-angle; universal animated "breathe" hover glow for a/button/[role=button]/[role=menuitem]/input/select/textarea/summary (gated @media (hover:hover), reduced-motion static fallback); :focus-visible outline+halo (not media-gated); Radix [data-highlighted] glow; premium .glow-border rotating conic-gradient border (::after ring, @supports mask-composite guard, graceful degradation); .card-hover/.glow-soft extended with brand glow; print resets all glows
+- .glow-border applied to: homepage hero primary+secondary CTAs, header "Request a Quote" Button, 4 division cards; .glow-soft on why-cards + portfolio cards; everything else covered by universal rules (incl. admin)
+- No-code hero: CompanySettings.heroJson added to schema (db:push OK, client regenerated); lib/settings.ts HeroContent type + defensive parseHero + readHeroJson/writeHeroJson via parameterized raw SQL (deliberate: long-running dev server's stale client omits unknown columns on typed SELECT and rejects them on typed UPDATE — raw SQL serves any client generation, zero downtime); PUT /api/settings accepts validated hero object (links restricted to /, #, http(s), mailto, tel — javascript: rejected 422), hero:null resets; GET returns parsed hero; homepage hero (badge/title/subtitle/CTA labels+hrefs/note) all settings-driven with built-in fallbacks
+- Admin settings page: new "Homepage hero section" editor card — badge, title, subtitle, primary/secondary CTA text+link, note, inline gradient LIVE PREVIEW updating as you type, helper text for link formats; Save All flow unchanged (hero included)
+- Debugging notes: dev server initially 500 on PUT (stale Prisma client) → solved via raw-SQL writer instead of gambling on a dev restart; Turbopack served stale CSS chunk after edits until a real content change + dependent-file touches forced rebuild (touched files alone insufficient); headless test browser reports (hover:none) so breathe glow verified via media-query introspection + focus-glow computed styles, while rotating .glow-border ring (not media-gated) verified live: afterOpacity 0→1 + animation glow-spin on mouse hover; scroll-behavior:smooth made scrollIntoView async — coordinates must be measured with scrollBehavior forced to auto
+- Verification: lint clean; 73/73 E2E suite passes; browser E2E — login → settings → edited badge/CTAs/note → Save → toast → homepage renders new hero (desktop dark screenshot), hero:null restores defaults (badge/CTA confirmed via DOM), invalid link 422; glow screenshots: CTA hover light, division card hover light+lift, input focus glow, dark card hover (mint comet), admin hero editor + live preview, mobile dark, final light desktop; dev.log clean
+- Hero content reset to defaults after testing (no invented company copy left in DB)
+
+Stage Summary:
+- Every interactive element now glows (brand green↔indigo) where the cursor touches it, with a rotating comet border on key CTAs/cards; the homepage hero is fully customizable from Admin → Settings with live preview and safe link validation — no code required. Functionality otherwise unchanged; 73/73 tests, lint clean; evidence download/preview/18–31.

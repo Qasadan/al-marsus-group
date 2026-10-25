@@ -1,11 +1,72 @@
 import { db } from "./db";
 import { resolveDivisions, type ResolvedDivision } from "./divisions";
 
+/** No-code hero editor content (stored as JSON in CompanySettings.heroJson). */
+export interface HeroContent {
+  badge: string | null;
+  primaryCtaLabel: string | null;
+  primaryCtaHref: string | null;
+  secondaryCtaLabel: string | null;
+  secondaryCtaHref: string | null;
+  note: string | null;
+}
+
+const HERO_KEYS: (keyof HeroContent)[] = [
+  "badge",
+  "primaryCtaLabel",
+  "primaryCtaHref",
+  "secondaryCtaLabel",
+  "secondaryCtaHref",
+  "note",
+];
+
+/** Parse the stored hero JSON defensively — malformed content falls back to nulls. */
+function parseHero(json: unknown): HeroContent {
+  const hero: HeroContent = {
+    badge: null,
+    primaryCtaLabel: null,
+    primaryCtaHref: null,
+    secondaryCtaLabel: null,
+    secondaryCtaHref: null,
+    note: null,
+  };
+  if (typeof json !== "string" || !json) return hero;
+  try {
+    const parsed = JSON.parse(json) as Record<string, unknown>;
+    if (parsed && typeof parsed === "object") {
+      for (const key of HERO_KEYS) {
+        const value = parsed[key];
+        if (typeof value === "string" && value.trim()) hero[key] = value.trim();
+      }
+    }
+  } catch {
+    // ignore malformed JSON — defaults apply
+  }
+  return hero;
+}
+
+/**
+ * heroJson is read/written via parameterized raw SQL so that any Prisma client
+ * generation can serve it — including a long-running dev server whose client was
+ * generated before the column was added (typed selects simply omit it; raw SQL
+ * bypasses the client's schema snapshot). Tagged templates are parameterized,
+ * so these calls are injection-safe.
+ */
+export async function readHeroJson(): Promise<string | null> {
+  const rows = await db.$queryRaw<{ heroJson: string | null }[]>`SELECT heroJson FROM CompanySettings WHERE id = 'main'`;
+  return rows[0]?.heroJson ?? null;
+}
+
+export async function writeHeroJson(json: string | null): Promise<void> {
+  await db.$executeRaw`UPDATE CompanySettings SET heroJson = ${json} WHERE id = 'main'`;
+}
+
 export interface PublicSettings {
   companyName: string;
   tagline: string | null;
   heroTitle: string | null;
   heroSubtitle: string | null;
+  hero: HeroContent;
   aboutText: string | null;
   missionText: string | null;
   visionText: string | null;
@@ -37,6 +98,7 @@ export async function getPublicSettings(): Promise<PublicSettings> {
     tagline: s?.tagline ?? null,
     heroTitle: s?.heroTitle ?? null,
     heroSubtitle: s?.heroSubtitle ?? null,
+    hero: parseHero(await readHeroJson()),
     aboutText: s?.aboutText ?? null,
     missionText: s?.missionText ?? null,
     visionText: s?.visionText ?? null,

@@ -132,7 +132,7 @@ export function SiteHeader({
               )}
               <ThemeToggle />
               <Link href="/quote">
-                <Button className="brand-gradient-green text-white shadow-sm hover:opacity-90 rounded-full" size="sm">
+                <Button className="glow-border brand-gradient-green text-white shadow-sm hover:opacity-90 rounded-full" size="sm">
                   Request a Quote
                 </Button>
               </Link>
