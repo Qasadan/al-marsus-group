@@ -68,8 +68,12 @@ export async function setSessionCookie(token: string) {
   const store = await cookies();
   store.set(SESSION_COOKIE, token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    // SameSite=None is required for the preview/embedded-frame context: the site
+    // is commonly viewed inside a cross-site iframe (chat preview), where browsers
+    // reject Lax cookies and login would appear to "succeed" but never persist.
+    // SameSite=None must be paired with Secure to be accepted by browsers.
+    sameSite: "none",
+    secure: true,
     maxAge: SESSION_TTL_SECONDS,
     path: "/",
   });
@@ -77,7 +81,13 @@ export async function setSessionCookie(token: string) {
 
 export async function clearSessionCookie() {
   const store = await cookies();
-  store.set(SESSION_COOKIE, "", { httpOnly: true, sameSite: "lax", maxAge: 0, path: "/" });
+  store.set(SESSION_COOKIE, "", {
+    httpOnly: true,
+    sameSite: "none",
+    secure: true,
+    maxAge: 0,
+    path: "/",
+  });
 }
 
 // Role-based access control matrix (server-side enforcement).
