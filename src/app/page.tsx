@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Zap, Cpu, HardHat, Snowflake, ShieldCheck, Users, Wrench } from "lucide-react";
 import { PublicShell } from "@/components/public/public-shell";
+import { HeroSlider } from "@/components/public/hero-slider";
 import { getPublicSettings } from "@/lib/settings";
 import { db } from "@/lib/db";
 import { divisionLabel } from "@/lib/divisions";
@@ -30,38 +31,50 @@ export default async function HomePage() {
   const heroNote =
     hero.note ??
     "Website content is managed by the company via the admin panel — sections marked as placeholders are pending official information.";
+  // Hero slider images (up to 3) — uploaded/managed in Admin → Settings, no code.
+  const heroImages = hero.images ?? [];
 
   return (
     <PublicShell>
-      {/* Hero — group level (content editable in Admin → Settings, no code required) */}
+      {/* Hero — group level (content + images editable in Admin → Settings, no code required).
+          With images: two-column (text left, fast glow-framed slider right); without: text only. */}
       <section className="brand-gradient hero-glow text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-20 lg:py-28">
-          <div className="max-w-2xl">
-            {heroBadge && (
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6 ring-1 ring-white/20 backdrop-blur-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" aria-hidden="true" />
-                {heroBadge}
-              </span>
-            )}
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold leading-[1.08] tracking-tight">
-              {heroTitle}
-            </h1>
-            <p className="mt-6 text-lg text-white/85 leading-relaxed">{heroSubtitle}</p>
-            <div className="mt-9 flex flex-col sm:flex-row gap-3">
-              <Link
-                href={primaryCta.href}
-                className="glow-border inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00A651]/25 hover:bg-[var(--brand-green-dark)] transition-colors"
-              >
-                {primaryCta.label} <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href={secondaryCta.href}
-                className="glow-border inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                {secondaryCta.label}
-              </Link>
+          <div className={heroImages.length > 0 ? "grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14" : "max-w-2xl"}>
+            <div className={heroImages.length > 0 ? "max-w-2xl" : undefined}>
+              {heroBadge && (
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium mb-6 ring-1 ring-white/20 backdrop-blur-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" aria-hidden="true" />
+                  {heroBadge}
+                </span>
+              )}
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold leading-[1.08] tracking-tight">
+                {heroTitle}
+              </h1>
+              <p className="mt-6 text-lg text-white/85 leading-relaxed">{heroSubtitle}</p>
+              <div className="mt-9 flex flex-col sm:flex-row gap-3">
+                <Link
+                  href={primaryCta.href}
+                  className="glow-border inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-[#00A651]/25 hover:bg-[var(--brand-green-dark)] transition-colors"
+                >
+                  {primaryCta.label} <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href={secondaryCta.href}
+                  className="glow-border inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-7 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+                >
+                  {secondaryCta.label}
+                </Link>
+              </div>
+              <p className="mt-8 text-xs text-white/60">{heroNote}</p>
             </div>
-            <p className="mt-8 text-xs text-white/60">{heroNote}</p>
+            {heroImages.length > 0 && (
+              <HeroSlider
+                images={heroImages}
+                priorityFirst
+                className="aspect-[4/3] w-full max-w-xl justify-self-center shadow-2xl shadow-black/25 lg:justify-self-end"
+              />
+            )}
           </div>
         </div>
       </section>

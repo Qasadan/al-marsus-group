@@ -9,9 +9,14 @@ export interface HeroContent {
   secondaryCtaLabel: string | null;
   secondaryCtaHref: string | null;
   note: string | null;
+  /** Up to 3 image URLs — rendered as a fast auto-sliding, glow-framed carousel. */
+  images: string[];
 }
 
-const HERO_KEYS: (keyof HeroContent)[] = [
+export const HERO_IMAGE_LIMIT = 3;
+
+/** String-valued hero fields (images is an array and is parsed separately). */
+const HERO_KEYS: Exclude<keyof HeroContent, "images">[] = [
   "badge",
   "primaryCtaLabel",
   "primaryCtaHref",
@@ -29,6 +34,7 @@ function parseHero(json: unknown): HeroContent {
     secondaryCtaLabel: null,
     secondaryCtaHref: null,
     note: null,
+    images: [],
   };
   if (typeof json !== "string" || !json) return hero;
   try {
@@ -37,6 +43,12 @@ function parseHero(json: unknown): HeroContent {
       for (const key of HERO_KEYS) {
         const value = parsed[key];
         if (typeof value === "string" && value.trim()) hero[key] = value.trim();
+      }
+      if (Array.isArray(parsed.images)) {
+        hero.images = parsed.images
+          .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+          .map((v) => v.trim())
+          .slice(0, HERO_IMAGE_LIMIT);
       }
     }
   } catch {

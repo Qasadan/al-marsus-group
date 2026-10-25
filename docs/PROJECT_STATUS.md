@@ -1,7 +1,7 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
-Last updated: 2026-10-25 (UI/UX refresh + dark mode + cursor glow + no-code hero editor session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete. Production build verified (Task 10). Preview-panel login fixed (Task 12). Public site restyled minimal/clean with persisted dark mode (Task 13). Cursor border-glow animations + no-code homepage hero editor in Admin → Settings delivered (Task 14); 73/73 E2E, lint clean, browser-verified in light & dark, desktop & mobile.**
+Last updated: 2026-10-25 (hero image slider session)
+Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete. Production build verified (Task 10). Preview-panel login fixed (Task 12). Public site restyled minimal/clean with persisted dark mode (Task 13). Cursor border-glow animations + no-code homepage hero editor in Admin → Settings delivered (Task 14). No-code hero IMAGE SLIDER (2–3 fast auto-sliding, glow-framed images, admin-managed) delivered (Task 15); 73/73 E2E, lint clean, production build + smoke verified.**
 
 ---
 
@@ -42,6 +42,26 @@ Honesty notes unchanged: division service catalogues are default configurable co
 - Verified end-to-end in the browser: admin edit → Save All → homepage reflects changes (badge/CTA/note), hero:null reset restores defaults
 
 Evidence: `download/preview/18–31` (light/dark × desktop/mobile glow states, CTA/card/input glow, admin hero editor + live preview, customized hero rendering, defaults restored).
+
+---
+
+## 0c. Hero image slider — admin-managed, glow-framed (Task 15) ✅
+
+The hero can now show up to **3 images that auto-slide quickly** (3s crossfade), framed by the animated brand border glow — all managed from the admin panel without code:
+
+- `HeroContent.images` (string[], ≤3) added to the existing `heroJson` — no schema migration needed; parsed defensively in `parseHero`
+- `PUT /api/settings` validates `hero.images`: each must be an uploaded path (`/uploads/…`) or `https://` URL (http rejected — mixed content); ≤3 images enforced (422 otherwise)
+- New `src/components/public/hero-slider.tsx` (client): stacked crossfade slides (700ms ease), 3s auto-advance, pauses while hovered/focused, clickable dot controls, `aria` labels, `priority` first image
+- Border glow on the slider: new `.glow-frame` utility — **always-on breathing glow** (green ↔ indigo, 3.4s, `prefers-reduced-motion` static fallback, print reset) + existing `.glow-border` comet sweep on hover; computed styles verified in-browser (`glow-breathe` running, comet `glow-spin` opacity 0→1 on hover)
+- Homepage hero: two-column layout when images are set (text left, slider right, mobile stacks text→slider); falls back to the previous text-only hero when no images — nothing else changed
+- Admin → Settings → "Hero slider images (up to 3)": **Upload image** (reuses secured `/api/uploads`, JPEG/PNG/WebP ≤5MB), paste image URL, reorder ↑/↓, remove, duplicate/limit guards with toasts; the live preview now embeds the real slider (WYSIWYG); changes publish on "Save All"
+- `next.config.ts`: `images.remotePatterns` allows `https://**` so admins can paste external image URLs; `distDir` env override (`NEXT_DIST_DIR`) enables non-destructive validation builds while the dev server runs (platform builds unaffected, still `.next`)
+- API verification: `ftp://` image → 422; 4th image → 422; upload → URL → UI add → reorder → Save All → homepage renders all 3 slides (browser E2E via agent-browser)
+- Production: isolated standalone build exit 0; smoke on :3001 — health 200, slider + 3 images in HTML, `/uploads/*` 200, `_next/image` optimizer 200
+
+Demo images note: the three hero images currently live in the DB/public/uploads are **AI-generated placeholders** (solar installation / network operations / cold-chain warehouse) so the feature is visible immediately; the company should replace them with real photos in Admin → Settings (upload or paste URL, reorder, Save All).
+
+Evidence: `download/preview/32–38` (desktop light hero, dark desktop, mobile dark ×2, hover comet, admin editor with live slider preview, images editor with reorder controls).
 
 ---
 

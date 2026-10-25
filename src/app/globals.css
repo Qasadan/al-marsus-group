@@ -371,6 +371,21 @@ summary:focus-visible,
   }
 }
 
+/* Always-on animated border glow for framed media (hero image slider).
+   Breathes between brand green and indigo; on hover .glow-border adds the comet. */
+.glow-frame {
+  border: 1px solid color-mix(in srgb, var(--brand-green-bright) 32%, transparent);
+  animation: glow-breathe 3.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow-frame {
+    animation: none;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand-green-bright) 28%, transparent),
+      0 0 16px -2px color-mix(in srgb, var(--brand-green-bright) 32%, transparent);
+  }
+}
+
 /* Print styles for quotation/invoice print views */
 @media print {
   .no-print {
@@ -396,7 +411,8 @@ summary:focus-visible,
   .card-hover,
   .glow-soft,
   .glow-border,
-  .glow-border::after {
+  .glow-border::after,
+  .glow-frame {
     box-shadow: none !important;
     text-shadow: none !important;
     animation: none !important;

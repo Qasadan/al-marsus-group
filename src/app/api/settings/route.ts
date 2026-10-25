@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { NextRequest } from "next/server";
 import { handleRoute, ok, requireAuth, parseBody } from "@/lib/api";
-import { getPublicSettings, getSettings, writeHeroJson } from "@/lib/settings";
+import { getPublicSettings, getSettings, writeHeroJson, HERO_IMAGE_LIMIT } from "@/lib/settings";
 import { writeAudit } from "@/lib/audit";
 import { db } from "@/lib/db";
 
@@ -19,6 +19,12 @@ const heroLink = z
   .string()
   .max(300)
   .regex(/^(\/|#|https?:\/\/|mailto:|tel:)/i, "Links must start with /, #, http(s)://, mailto: or tel:");
+// Hero slider images: uploaded paths (/uploads/…) or https:// URLs only — http would
+// be blocked as mixed content on the https site, so it is rejected up front.
+const heroImage = z
+  .string()
+  .max(500)
+  .regex(/^(\/|https:\/\/)/i, "Images must be an uploaded path (starting with /) or an https:// URL");
 const heroSchema = z
   .object({
     badge: z.string().max(120).nullable().optional(),
@@ -27,6 +33,7 @@ const heroSchema = z
     secondaryCtaLabel: z.string().max(80).nullable().optional(),
     secondaryCtaHref: heroLink.nullable().optional(),
     note: z.string().max(300).nullable().optional(),
+    images: z.array(heroImage).max(HERO_IMAGE_LIMIT, `Up to ${HERO_IMAGE_LIMIT} hero images`).nullable().optional(),
   })
   .strict();
 

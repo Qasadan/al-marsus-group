@@ -164,3 +164,25 @@ Work Log:
 
 Stage Summary:
 - Every interactive element now glows (brand green↔indigo) where the cursor touches it, with a rotating comet border on key CTAs/cards; the homepage hero is fully customizable from Admin → Settings with live preview and safe link validation — no code required. Functionality otherwise unchanged; 73/73 tests, lint clean; evidence download/preview/18–31.
+
+---
+Task ID: 15
+Agent: main
+Task: User request — hero section replaceable with 2-3 images that slide quickly with border glow animations, managed by admin without code
+
+Work Log:
+- Extended no-code hero (Task 14 foundation): HeroContent.images (string[], max 3) in src/lib/settings.ts with defensive parseHero handling; no DB migration needed (heroJson string column)
+- PUT /api/settings heroSchema: images array validated — each entry must start with / or https:// (http rejected: mixed content; ftp: etc. rejected), max 3 (422 on violation); verified via curl (ftp → 422, 4th image → 422)
+- New src/components/public/hero-slider.tsx (client): stacked absolute slides, 700ms crossfade, 3s quick auto-advance (pause on hover/focus), clickable dot controls (role=tablist), aria labels, priority first image, controls={false} mode for the admin preview (avoids focusable elements in aria-hidden)
+- Border glow: new .glow-frame CSS utility — always-on glow-breathe animation (green↔indigo, 3.4s) + brand border tint; reduced-motion static fallback; added to print reset; combined with .glow-border comet sweep on hover/focus
+- Homepage hero (src/app/page.tsx): two-column grid when images present (text left, HeroSlider right, aspect-4/3, justify-self-end on lg); previous text-only hero preserved when no images — zero other changes
+- Admin settings hero editor: new "Hero slider images (up to 3)" block — Upload image button (hidden file input → POST /api/uploads, secured, JPEG/PNG/WebP ≤5MB), paste-URL input + Add, thumbnail rows with move up/down + remove, duplicate/limit guards with toasts; live preview now embeds the REAL HeroSlider (WYSIWYG, 2.2s interval); images saved within hero object on Save All
+- next.config.ts: images.remotePatterns https:** (admin-pasted external URLs render via next/image); distDir env override NEXT_DIST_DIR for non-destructive validation builds while dev server runs (platform build.sh guard hardcodes .next/standalone — default path unchanged)
+- Browser E2E (agent-browser): admin login → settings → added 3 uploaded image URLs via UI → reorder down/up verified (order flips + restores) → Save All → toast → DB hero images persisted → homepage renders 3 slides with dots; auto-advance observed (active 0→1→0 over ~7s); dot click jumps to slide 3; computed styles: frame animation glow-breathe running, hover ::after opacity 0→1 + glow-spin (comet), hover pauses timer
+- Testing notes: agent-browser click on rapidly re-rendered buttons silently no-ops (disabled→enabled race) — el.click() via eval reliable; const in eval leaks to page realm (SyntaxError on repeat) — wrap in IIFE
+- 3 demo hero images generated (z-ai CLI, 1152x864 4:3): solar install / network operations center / cold-chain warehouse; uploaded via /api/uploads as admin; left live in the hero as clearly-labeled AI placeholders for the company to replace with real photos
+- Verification: lint clean; 73/73 E2E suite passes; isolated prod build (NEXT_DIST_DIR=.next-prodcheck, since removed) exit 0; standalone smoke on :3001 — health 200, slider + all 3 images in HTML, /uploads/* 200, _next/image optimizer 200, heroJson raw-SQL read OK in prod; tsconfig auto-edit from isolated build reverted; dev server untouched on :3000
+- Evidence: download/preview/32 (desktop light full) 33 (dark desktop) 34 (mobile dark top) 35 (mobile slider+glow) 36 (hover comet light) 37 (admin editor + live slider preview) 38 (images editor thumbnails/reorder)
+
+Stage Summary:
+- Hero is now a fast auto-sliding, glow-framed image carousel fully managed from Admin → Settings (upload/paste/reorder/remove + WYSIWYG preview) with zero code; text-only hero preserved when no images configured. API hardened against bad schemes and >3 images. 73/73 tests, lint clean, production build + smoke verified. AI placeholder images left live for demonstration; company replaces with real photos in the admin.

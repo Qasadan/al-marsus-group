@@ -1,15 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/admin/shared";
+import { HeroSlider } from "@/components/public/hero-slider";
 import { api, ApiClientError } from "@/lib/client";
 import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
-import { Loader2, Save, Plus, Trash2 } from "lucide-react";
+import { Loader2, Save, Plus, Trash2, Upload, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+// Keep in sync with HERO_IMAGE_LIMIT in lib/settings (importing that file here would
+// pull the Prisma client into the admin client bundle).
+const HERO_IMAGES_MAX = 3;
 
 interface SettingsShape {
   companyName: string; tagline: string; heroTitle: string; heroSubtitle: string;
@@ -31,6 +37,10 @@ export default function SettingsPage() {
   const [divisions, setDivisions] = useState<DivisionRow[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [heroImages, setHeroImages] = useState<string[]>([]);
+  const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const heroFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     api<Record<string, unknown>>("/api/settings").then((d) => {
@@ -52,6 +62,11 @@ export default function SettingsPage() {
         quotationTerms: d.quotationTerms ?? "", invoiceTerms: d.invoiceTerms ?? "",
       });
       setServices(Array.isArray(d.services) ? d.services : []);
+      setHeroImages(
+        Array.isArray(hero.images)
+          ? hero.images.filter((v: unknown) => typeof v === "string" && v.trim()).slice(0, HERO_IMAGES_MAX)
+          : []
+      );
       const resolved = Array.isArray(d.divisions) ? d.divisions : [];
       setDivisions(
         DIVISION_CODES.map((code) => {
@@ -91,6 +106,7 @@ export default function SettingsPage() {
             secondaryCtaLabel: form.heroSecondaryCtaLabel || null,
             secondaryCtaHref: form.heroSecondaryCtaHref || null,
             note: form.heroNote || null,
+            images: heroImages.slice(0, HERO_IMAGES_MAX),
           },
           aboutText: form.aboutText || null,
           missionText: form.missionText || null,
@@ -128,6 +144,55 @@ export default function SettingsPage() {
   const setDivision = (code: string, patch: Partial<DivisionRow>) =>
     setDivisions(divisions.map((d) => (d.code === code ? { ...d, ...patch } : d)));
 
+  // --- Hero slider images (no-code) ---
+  function addHeroImageUrl() {
+    const url = heroImageUrl.trim();
+    if (!url) return;
+    if (heroImages.length >= HERO_IMAGES_MAX) {
+      toast({ title: `Up to ${HERO_IMAGES_MAX} images`, description: "Remove one first to add another." });
+      return;
+    }
+    if (!/^(\/|https:\/\/)/i.test(url)) {
+      toast({ title: "Unsupported image link", description: "Use an uploaded path (/uploads/…) or an https:// URL.", variant: "destructive" });
+      return;
+    }
+    if (!heroImages.includes(url)) setHeroImages((imgs) => [...imgs, url].slice(0, HERO_IMAGES_MAX));
+    setHeroImageUrl("");
+  }
+
+  async function uploadHeroImage(file: File) {
+    if (heroImages.length >= HERO_IMAGES_MAX) {
+      toast({ title: `Up to ${HERO_IMAGES_MAX} images`, description: "Remove one first to add another." });
+      return;
+    }
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/uploads", { method: "POST", body: fd });
+      const payload = (await res.json().catch(() => null)) as { success?: boolean; data?: { url?: string }; error?: { message?: string } } | null;
+      if (!res.ok || !payload?.success || !payload.data?.url) {
+        throw new Error(payload?.error?.message ?? "Upload failed");
+      }
+      const url = payload.data.url;
+      setHeroImages((imgs) => (imgs.includes(url) || imgs.length >= HERO_IMAGES_MAX ? imgs : [...imgs, url]));
+      toast({ title: "Image uploaded", description: "Click Save All to publish it to the hero slider." });
+    } catch (e) {
+      toast({ title: "Upload failed", description: e instanceof Error ? e.message : "Try a smaller JPEG/PNG/WebP image.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+      if (heroFileRef.current) heroFileRef.current.value = "";
+    }
+  }
+
+  function moveHeroImage(index: number, dir: -1 | 1) {
+    const j = index + dir;
+    if (j < 0 || j >= heroImages.length) return;
+    const next = [...heroImages];
+    [next[index], next[j]] = [next[j], next[index]];
+    setHeroImages(next);
+  }
+
   return (
     <div>
       <PageHeader
@@ -161,29 +226,36 @@ export default function SettingsPage() {
                 the built-in defaults.
               </p>
             </div>
-            {/* Live preview */}
+            {/* Live preview — mirrors the public hero, including the image slider */}
             <div className="brand-gradient hero-glow rounded-xl p-5 text-white overflow-hidden" aria-hidden="true">
-              {form.heroBadge && (
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium mb-3 ring-1 ring-white/20">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" />
-                  {form.heroBadge}
-                </span>
-              )}
-              <p className="text-lg font-bold leading-snug tracking-tight line-clamp-2">
-                {form.heroTitle || "Your hero title appears here"}
-              </p>
-              <p className="mt-1.5 text-xs text-white/80 line-clamp-2">
-                {form.heroSubtitle || "Your hero subtitle appears here."}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3.5 py-1.5 text-xs font-semibold">
-                  {form.heroPrimaryCtaLabel || "Request a Free Quote"}
-                </span>
-                <span className="inline-flex items-center rounded-full border border-white/40 px-3.5 py-1.5 text-xs font-semibold">
-                  {form.heroSecondaryCtaLabel || "Explore Our Divisions"}
-                </span>
+              <div className={heroImages.length > 0 ? "grid items-center gap-4 sm:grid-cols-2" : undefined}>
+                <div>
+                  {form.heroBadge && (
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium mb-3 ring-1 ring-white/20">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" />
+                      {form.heroBadge}
+                    </span>
+                  )}
+                  <p className="text-lg font-bold leading-snug tracking-tight line-clamp-2">
+                    {form.heroTitle || "Your hero title appears here"}
+                  </p>
+                  <p className="mt-1.5 text-xs text-white/80 line-clamp-2">
+                    {form.heroSubtitle || "Your hero subtitle appears here."}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3.5 py-1.5 text-xs font-semibold">
+                      {form.heroPrimaryCtaLabel || "Request a Free Quote"}
+                    </span>
+                    <span className="inline-flex items-center rounded-full border border-white/40 px-3.5 py-1.5 text-xs font-semibold">
+                      {form.heroSecondaryCtaLabel || "Explore Our Divisions"}
+                    </span>
+                  </div>
+                  {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
+                </div>
+                {heroImages.length > 0 && (
+                  <HeroSlider images={heroImages} intervalMs={2200} controls={false} className="h-40 w-full" />
+                )}
               </div>
-              {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-1.5 lg:col-span-2">
@@ -217,6 +289,70 @@ export default function SettingsPage() {
               <div className="space-y-1.5 lg:col-span-2">
                 <Label htmlFor="s-hero-note">Small note under the buttons (optional)</Label>
                 <Textarea id="s-hero-note" rows={2} value={form.heroNote} onChange={(e) => set({ heroNote: e.target.value })} />
+              </div>
+
+              {/* Hero slider images — upload/paste, reorder, remove; no code needed */}
+              <div className="space-y-3 lg:col-span-2 border-t border-border pt-4">
+                <div>
+                  <Label>Hero slider images (up to {HERO_IMAGES_MAX})</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Optional. With images, the hero shows them as a fast auto-sliding carousel framed by an animated
+                    brand glow. Without images, the hero stays text-only. Changes go live after “Save All”.
+                  </p>
+                </div>
+                {heroImages.length > 0 && (
+                  <div className="space-y-2">
+                    {heroImages.map((url, i) => (
+                      <div key={`${url}-${i}`} className="flex items-center gap-3 rounded-md border border-border p-2">
+                        <Image src={url} alt={`Hero image ${i + 1}`} width={96} height={64} className="h-16 w-24 shrink-0 rounded object-cover" />
+                        <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground" title={url}>{url}</span>
+                        <div className="flex shrink-0 items-center gap-0.5">
+                          <Button type="button" variant="ghost" size="icon" aria-label="Move image up" disabled={i === 0} onClick={() => moveHeroImage(i, -1)}>
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button type="button" variant="ghost" size="icon" aria-label="Move image down" disabled={i === heroImages.length - 1} onClick={() => moveHeroImage(i, 1)}>
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                          <Button type="button" variant="ghost" size="icon" aria-label="Remove image" className="text-red-600 hover:text-red-600" onClick={() => setHeroImages(heroImages.filter((_, idx) => idx !== i))}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    ref={heroFileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && uploadHeroImage(e.target.files[0])}
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={() => heroFileRef.current?.click()} disabled={uploading || heroImages.length >= HERO_IMAGES_MAX}>
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload image
+                  </Button>
+                  <div className="flex min-w-[220px] flex-1 items-center gap-2">
+                    <Input
+                      value={heroImageUrl}
+                      onChange={(e) => setHeroImageUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addHeroImageUrl();
+                        }
+                      }}
+                      placeholder="…or paste an image link (/uploads/… or https://)"
+                      aria-label="Image URL"
+                    />
+                    <Button type="button" variant="outline" size="sm" onClick={addHeroImageUrl} disabled={heroImages.length >= HERO_IMAGES_MAX || !heroImageUrl.trim()}>
+                      <Plus className="h-4 w-4" /> Add
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Uploads accept JPEG/PNG/WebP up to 5MB. The first image shows first; use the arrows to reorder.
+                </p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
