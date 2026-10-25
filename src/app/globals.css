@@ -48,12 +48,13 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   /* Official brand colors — Al-Marsus Group Ltd */
   --brand-indigo: #34369B;
   --brand-indigo-dark: #26286E;
   --brand-green: #00A651;
   --brand-green-dark: #008541;
+  --brand-green-bright: #00A651;
 
   --background: #FFFFFF;
   --foreground: #1a1b2e;
@@ -73,7 +74,7 @@
   --accent-foreground: #008541;
   --destructive: #dc2626;
   --destructive-foreground: #FFFFFF;
-  --border: #e3e4ec;
+  --border: #e6e7ef;
   --input: #d8d9e6;
   --ring: #34369B;
   --chart-1: #34369B;
@@ -92,37 +93,40 @@
 }
 
 .dark {
-  --background: #12132a;
-  --foreground: #eceef8;
-  --card: #1a1b38;
-  --card-foreground: #eceef8;
-  --popover: #1a1b38;
-  --popover-foreground: #eceef8;
-  --primary: #7C7DD6;
-  --primary-foreground: #FFFFFF;
-  --secondary: #23245e;
-  --secondary-foreground: #eceef8;
-  --muted: #23245e;
-  --muted-foreground: #a3a4c2;
-  --accent: #0c2f21;
-  --accent-foreground: #66C79A;
+  --brand-green-bright: #4ecb8d;
+  --background: #0d0e1d;
+  --foreground: #edeef8;
+  --card: #14152a;
+  --card-foreground: #edeef8;
+  --popover: #14152a;
+  --popover-foreground: #edeef8;
+  /* Primary = brand indigo, lightened for dark-surface contrast */
+  --primary: #8b8de3;
+  --primary-foreground: #101128;
+  --secondary: #1e2044;
+  --secondary-foreground: #c9cae8;
+  --muted: #171832;
+  --muted-foreground: #9a9cb8;
+  /* Accent = brand green, brightened for dark surfaces */
+  --accent: #0d2b1f;
+  --accent-foreground: #5fd398;
   --destructive: #ef4444;
   --destructive-foreground: #FFFFFF;
-  --border: #2c2d55;
-  --input: #2c2d55;
-  --ring: #7C7DD6;
-  --chart-1: #7C7DD6;
-  --chart-2: #66C79A;
+  --border: #262848;
+  --input: #2b2d50;
+  --ring: #8b8de3;
+  --chart-1: #8b8de3;
+  --chart-2: #4ecb8d;
   --chart-3: #34369B;
   --chart-4: #00A651;
-  --chart-5: #a3a4c2;
-  --sidebar: #1a1b38;
+  --chart-5: #9a9cb8;
+  --sidebar: #14152a;
   --sidebar-foreground: #C9CAE8;
   --sidebar-primary: #FFFFFF;
   --sidebar-primary-foreground: #34369B;
-  --sidebar-accent: #23245e;
-  --sidebar-accent-foreground: #eceef8;
-  --sidebar-border: #2c2d55;
+  --sidebar-accent: #1e2044;
+  --sidebar-accent-foreground: #edeef8;
+  --sidebar-border: #262848;
   --sidebar-ring: #00A651;
 }
 
@@ -132,6 +136,9 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }
 
@@ -147,6 +154,54 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Minimal, clean section accents */
+.eyebrow {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-green-bright);
+}
+
+/* Soft lift for cards */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -12px rgba(38, 40, 110, 0.18);
+  border-color: color-mix(in srgb, var(--brand-indigo) 25%, var(--border));
+}
+.dark .card-hover:hover {
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.55);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+}
+
+/* Decorative radial glows for gradient sections */
+.hero-glow {
+  position: relative;
+  overflow: hidden;
+}
+.hero-glow > * {
+  position: relative;
+  z-index: 1;
+}
+.hero-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(640px 320px at 88% 12%, rgba(0, 166, 81, 0.22), transparent 62%),
+    radial-gradient(520px 280px at 6% 92%, rgba(255, 255, 255, 0.1), transparent 60%);
+}
+.hero-glow-green::before {
+  background:
+    radial-gradient(560px 300px at 14% 0%, rgba(255, 255, 255, 0.16), transparent 58%),
+    radial-gradient(620px 320px at 92% 110%, rgba(38, 40, 110, 0.35), transparent 60%);
 }
 
 /* Print styles for quotation/invoice print views */

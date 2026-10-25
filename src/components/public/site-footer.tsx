@@ -18,7 +18,7 @@ export function SiteFooter({
   address?: string | null;
 }) {
   return (
-    <footer className="mt-auto bg-[var(--brand-indigo-dark)] text-white">
+    <footer className="mt-auto bg-[var(--brand-indigo-dark)] text-white dark:bg-[#0a0b1a] dark:border-t dark:border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>

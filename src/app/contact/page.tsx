@@ -42,13 +42,13 @@ export default async function ContactPage() {
           {contacts.length > 0 ? (
             contacts.map((c) => (
               <div key={c.label} className="flex items-start gap-4 rounded-xl border border-border bg-card p-5">
-                <div className="rounded-lg bg-secondary p-2.5 text-[var(--brand-indigo)]">
+                <div className="rounded-lg bg-secondary p-2.5 text-primary">
                   <c.icon className="h-5 w-5" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{c.label}</p>
                   {c.href ? (
-                    <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="font-medium hover:text-[var(--brand-indigo)]">
+                    <a href={c.href} target={c.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="font-medium hover:text-primary">
                       {c.value}
                     </a>
                   ) : (
@@ -64,7 +64,7 @@ export default async function ContactPage() {
             </div>
           )}
           <div className="flex items-start gap-4 rounded-xl border border-border bg-card p-5">
-            <div className="rounded-lg bg-secondary p-2.5 text-[var(--brand-indigo)]">
+            <div className="rounded-lg bg-secondary p-2.5 text-primary">
               <Clock className="h-5 w-5" />
             </div>
             <div>

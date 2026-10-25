@@ -38,15 +38,15 @@ export default async function DivisionsPage() {
             >
               <div className={index % 2 === 1 ? "lg:order-2" : undefined}>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="inline-flex rounded-lg bg-secondary p-3 text-[var(--brand-indigo)]">
+                  <span className="inline-flex rounded-lg bg-secondary p-3 text-primary">
                     <Icon className="h-6 w-6" />
                   </span>
                   <span className="text-4xl font-bold text-secondary select-none">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                 </div>
-                <h2 className="text-2xl font-bold text-[var(--brand-indigo)]">{d.fullName}</h2>
-                <p className="mt-2 font-medium text-[var(--brand-green)]">{d.tagline}</p>
+                <h2 className="text-2xl font-bold text-primary">{d.fullName}</h2>
+                <p className="mt-2 font-medium text-[var(--brand-green)] dark:text-[var(--brand-green-bright)]">{d.tagline}</p>
                 <p className="mt-3 text-sm text-muted-foreground leading-relaxed">{d.description}</p>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <Link
@@ -57,7 +57,7 @@ export default async function DivisionsPage() {
                   </Link>
                   <Link
                     href="/quote"
-                    className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-[var(--brand-indigo)] hover:bg-muted"
+                    className="inline-flex items-center gap-2 rounded-md border border-border px-4 py-2 text-sm font-semibold text-primary hover:bg-muted"
                   >
                     Request a quote
                   </Link>

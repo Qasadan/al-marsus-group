@@ -75,7 +75,7 @@ export default async function DivisionDetailPage({ params }: { params: Promise<{
 
       {/* Overview */}
       <section className="mx-auto max-w-4xl px-4 sm:px-6 py-14">
-        <h2 className="text-2xl font-bold text-[var(--brand-indigo)] mb-4">About this division</h2>
+        <h2 className="text-2xl font-bold text-primary mb-4">About this division</h2>
         <div className="space-y-3 text-foreground/85 leading-relaxed">
           {division.description.split("\n").filter(Boolean).map((p, i) => (
             <p key={i}>{p}</p>
@@ -86,7 +86,7 @@ export default async function DivisionDetailPage({ params }: { params: Promise<{
       {/* Services */}
       <section className="bg-muted">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
-          <h2 className="text-2xl font-bold text-[var(--brand-indigo)] mb-2">Services</h2>
+          <h2 className="text-2xl font-bold text-primary mb-2">Services</h2>
           <p className="text-muted-foreground mb-8">
             {division.shortName} offers the following services. The company can update this catalogue at any time in
             Admin → Settings.
@@ -94,7 +94,7 @@ export default async function DivisionDetailPage({ params }: { params: Promise<{
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {division.services.map((s) => (
               <div key={s.title} className="rounded-xl border border-border bg-card p-6">
-                <CheckCircle2 className="h-6 w-6 text-[var(--brand-green)] mb-3" />
+                <CheckCircle2 className="h-6 w-6 text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] mb-3" />
                 <h3 className="font-semibold mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
               </div>
@@ -105,7 +105,7 @@ export default async function DivisionDetailPage({ params }: { params: Promise<{
 
       {/* Cross-links to other divisions */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
-        <h2 className="text-xl font-bold text-[var(--brand-indigo)] mb-6">Explore our other divisions</h2>
+        <h2 className="text-xl font-bold text-primary mb-6">Explore our other divisions</h2>
         <div className="grid gap-6 sm:grid-cols-3">
           {others.map((d) => {
             const OtherIcon = DIVISION_ICONS[d.icon];
@@ -115,7 +115,7 @@ export default async function DivisionDetailPage({ params }: { params: Promise<{
                 href={`/divisions/${d.slug}`}
                 className="group rounded-xl border border-border bg-card p-6 hover:shadow-md transition-shadow"
               >
-                <span className="mb-3 inline-flex rounded-lg bg-secondary p-2.5 text-[var(--brand-indigo)]">
+                <span className="mb-3 inline-flex rounded-lg bg-secondary p-2.5 text-primary">
                   <OtherIcon className="h-5 w-5" />
                 </span>
                 <h3 className="font-semibold group-hover:underline">{d.shortName}</h3>

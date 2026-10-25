@@ -33,16 +33,16 @@ export default async function ServicesPage() {
           return (
             <div key={d.code} id={d.slug}>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-                <span className="inline-flex rounded-lg bg-secondary p-3 text-[var(--brand-indigo)]">
+                <span className="inline-flex rounded-lg bg-secondary p-3 text-primary">
                   <Icon className="h-6 w-6" />
                 </span>
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-[var(--brand-indigo)]">{d.fullName}</h2>
+                  <h2 className="text-xl font-bold text-primary">{d.fullName}</h2>
                   <p className="text-sm text-muted-foreground">{d.tagline}</p>
                 </div>
                 <Link
                   href={`/divisions/${d.slug}`}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-green)] hover:underline shrink-0"
+                  className="inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] hover:underline shrink-0"
                 >
                   Division details <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -50,7 +50,7 @@ export default async function ServicesPage() {
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {d.services.map((svc) => (
                   <div key={svc.title} className="rounded-xl border border-border bg-card p-6">
-                    <CheckCircle2 className="h-5 w-5 text-[var(--brand-green)] mb-3" />
+                    <CheckCircle2 className="h-5 w-5 text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] mb-3" />
                     <h3 className="font-semibold mb-2">{svc.title}</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">{svc.description}</p>
                   </div>
@@ -62,7 +62,7 @@ export default async function ServicesPage() {
 
         {s.services.length > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-[var(--brand-indigo)] mb-2">Other group-wide services</h2>
+            <h2 className="text-xl font-bold text-primary mb-2">Other group-wide services</h2>
             <p className="text-sm text-muted-foreground mb-6">
               Additional services configured by the company in Admin → Settings.
             </p>

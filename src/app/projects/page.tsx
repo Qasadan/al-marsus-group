@@ -41,7 +41,7 @@ export default async function ProjectsPage({
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               !selected
                 ? "brand-gradient text-white"
-                : "border border-border bg-card text-muted-foreground hover:text-[var(--brand-indigo)] hover:bg-muted"
+                : "border border-border bg-card text-muted-foreground hover:text-primary hover:bg-muted"
             }`}
           >
             All divisions
@@ -53,7 +53,7 @@ export default async function ProjectsPage({
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 selected?.code === d.code
                   ? "brand-gradient text-white"
-                  : "border border-border bg-card text-muted-foreground hover:text-[var(--brand-indigo)] hover:bg-muted"
+                  : "border border-border bg-card text-muted-foreground hover:text-primary hover:bg-muted"
               }`}
             >
               {d.shortName}
@@ -77,7 +77,7 @@ export default async function ProjectsPage({
                 <div className="p-5">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     {item.division && (
-                      <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">
+                      <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-primary">
                         {divisionLabel(item.division)}
                       </span>
                     )}
@@ -104,7 +104,7 @@ export default async function ProjectsPage({
             {selected ? (
               <>
                 No published projects for {selected.shortName} yet.{" "}
-                <Link href="/projects" className="text-[var(--brand-green)] hover:underline">
+                <Link href="/projects" className="text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] hover:underline">
                   View all divisions
                 </Link>
               </>

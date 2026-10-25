@@ -69,7 +69,7 @@ export function QuoteForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate={false}>
       {status === "error" && (
-        <div className="flex items-start gap-2 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700" role="alert">
+        <div className="flex items-start gap-2 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-300" role="alert">
           <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
           {errorMsg}
         </div>

@@ -27,7 +27,7 @@ export default async function AboutPage() {
       </section>
       <section className="mx-auto max-w-4xl px-4 sm:px-6 py-14 space-y-10">
         <div>
-          <h2 className="text-2xl font-bold text-[var(--brand-indigo)] mb-3">Who we are</h2>
+          <h2 className="text-2xl font-bold text-primary mb-3">Who we are</h2>
           <div className="prose-sm space-y-3 text-foreground/85 leading-relaxed">
             {(s.aboutText ??
               "Al-Marsus Group Ltd is an engineering and services group operating through four specialised divisions. [Full company profile — configure in Admin → Settings.]")
@@ -41,7 +41,7 @@ export default async function AboutPage() {
 
         {/* Group structure — the four divisions */}
         <div>
-          <h2 className="text-2xl font-bold text-[var(--brand-indigo)] mb-3">Group structure</h2>
+          <h2 className="text-2xl font-bold text-primary mb-3">Group structure</h2>
           <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
             The group delivers its work through four specialised business branches, each with dedicated teams and a
             defined service catalogue.
@@ -56,10 +56,10 @@ export default async function AboutPage() {
                   className="group rounded-xl border border-border bg-card p-5 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="inline-flex rounded-lg bg-secondary p-2 text-[var(--brand-indigo)]">
+                    <span className="inline-flex rounded-lg bg-secondary p-2 text-primary">
                       <Icon className="h-5 w-5" />
                     </span>
-                    <h3 className="font-semibold text-[var(--brand-indigo)] group-hover:underline">{d.fullName}</h3>
+                    <h3 className="font-semibold text-primary group-hover:underline">{d.fullName}</h3>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">{d.tagline}</p>
                 </Link>
@@ -68,7 +68,7 @@ export default async function AboutPage() {
           </div>
           <Link
             href="/divisions"
-            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-green)] hover:underline"
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] hover:underline"
           >
             Explore all divisions <ArrowRight className="h-4 w-4" />
           </Link>
@@ -76,13 +76,13 @@ export default async function AboutPage() {
 
         <div className="grid gap-6 sm:grid-cols-2">
           <div className="rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-[var(--brand-indigo)] mb-2">Our Mission</h3>
+            <h3 className="font-semibold text-primary mb-2">Our Mission</h3>
             <p className="text-sm text-muted-foreground">
               {s.missionText ?? "[Placeholder — configure in Admin → Settings.]"}
             </p>
           </div>
           <div className="rounded-xl border border-border p-6">
-            <h3 className="font-semibold text-[var(--brand-green)] mb-2">Our Vision</h3>
+            <h3 className="font-semibold text-[var(--brand-green)] dark:text-[var(--brand-green-bright)] mb-2">Our Vision</h3>
             <p className="text-sm text-muted-foreground">
               {s.visionText ?? "[Placeholder — configure in Admin → Settings.]"}
             </p>

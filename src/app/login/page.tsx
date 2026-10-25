@@ -49,14 +49,14 @@ function LoginForm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--brand-indigo)] via-[var(--brand-indigo-dark)] to-[#1a1b4a] px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
           <div className="flex flex-col items-center mb-8">
             <Image src="/images/logo.jpg" alt="Al-Marsus Group Ltd logo" width={64} height={57} className="rounded-lg mb-3" priority />
-            <h1 className="text-xl font-bold text-[var(--brand-indigo)]">Al-Marsus Group Ltd</h1>
+            <h1 className="text-xl font-bold text-primary">Al-Marsus Group Ltd</h1>
             <p className="text-sm text-muted-foreground">Business management system</p>
           </div>
           {error && (
-            <div className="mb-4 flex items-start gap-2 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700" role="alert">
+            <div className="mb-4 flex items-start gap-2 rounded-md bg-red-50 border border-red-200 p-3 text-sm text-red-700 dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-300" role="alert">
               <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" /> {error}
             </div>
           )}
