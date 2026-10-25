@@ -112,3 +112,19 @@ Work Log:
 
 Stage Summary:
 - Live run confirmed working end-to-end in production mode, including authenticated admin. One real prod-only bug found and fixed. Screenshot evidence in download/preview/. Committed.
+
+---
+Task ID: 12
+Agent: main
+Task: User-reported "admin login not working" in preview — diagnosed and minimally fixed (user constraint: change nothing else)
+
+Work Log:
+- Server logs showed the user's real attempt: POST /api/auth/login 200 + LOGIN audit entry, then bounce to /login?next=/admin — credentials VALID, cookie set, but browser did not keep it
+- Isolation: curl login + /admin with cookie -> 200 dashboard (server-side fully healthy)
+- Root cause: preview renders the app inside a cross-site iframe (dev.log cross-origin warning confirms preview origin); browsers reject SameSite=Lax cookies in cross-site embedded contexts -> session cookie silently dropped
+- Fix (src/lib/auth.ts ONLY, per user constraint): setSessionCookie/clearSessionCookie attrs -> SameSite=None; Secure (standard embedded-context fix; injected env still works, deploys behind HTTPS gateway unaffected)
+- Verified: raw Set-Cookie shows Secure; HttpOnly; SameSite=none; real browser top-level login -> /admin (screenshot 10); full 73-assertion suite 73/73; faithful cross-site iframe reproduction (parent 127.0.0.1:3999 -> frame https://preview-chat-<id>.space-z.ai) logs in and renders admin dashboard (screenshot 11)
+- Harness artifacts observed (not mine, left untouched): all files mode-changed 644->755; JWT_SECRET line wiped from .env (re-added to restore verified state; dev fallback + deploy start.sh auto-provision cover both contexts anyway); db/custom.db grew from E2E test data
+
+Stage Summary:
+- Admin login works in the user's actual preview context; only the session-cookie attributes changed (commit 8b8f3ff). Evidence: download/preview/10-login-works-admin.png, 11-iframe-embed-login-fixed.png

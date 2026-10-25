@@ -99,6 +99,7 @@ Honesty notes unchanged: division service catalogues are default configurable co
 4. React lint `set-state-in-effect` in dialogs — refactored to remount pattern.
 5. Missing `Select` imports in gallery page.
 6. **Production-only login 500** (found 2026-10-25 during live prod smoke test): `getSecret()` threw "JWT_SECRET must be set in production" — dev used a fallback, prod had none, and the platform deploy pipeline sets no `JWT_SECRET`. Fixed at runtime-provisioning level (no app-code change): real `JWT_SECRET` added to sandbox `.env`; bundled `start.sh` now auto-generates and persists a random secret to `<db-dir>/.jwt-secret` (0600) when none is injected. Verified: login 200 + Set-Cookie; Edge middleware accepts the session (`/admin` renders dashboard).
+7. **Admin login "not working" in the preview panel** (reported by user 2026-10-25): server logs showed `POST /api/auth/login 200` followed by a bounce back to `/login?next=/admin` — credentials were valid and the cookie was set, but the browser dropped it. Root cause: the preview renders the site inside a **cross-site iframe**, and browsers reject `SameSite=Lax` cookies in that context. Fix (minimal, `src/lib/auth.ts` only): session cookie attributes changed to `SameSite=None; Secure`. Verified: real browser login lands on `/admin` (top-level AND embedded-frame reproduction via cross-site iframe to the public preview URL — screenshot `download/preview/11-iframe-embed-login-fixed.png`); full 73-assertion suite re-run: 73/73 pass.
 
 ## 4. Remaining tasks (external to sandbox)
 
