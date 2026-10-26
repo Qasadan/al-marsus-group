@@ -1,0 +1,518 @@
+     1→"use client";
+     2→
+     3→import { useEffect, useRef, useState } from "react";
+     4→import Image from "next/image";
+     5→import { Button } from "@/components/ui/button";
+     6→import { Input } from "@/components/ui/input";
+     7→import { Label } from "@/components/ui/label";
+     8→import { Textarea } from "@/components/ui/textarea";
+     9→import { PageHeader } from "@/components/admin/shared";
+    10→import { HeroSlider } from "@/components/public/hero-slider";
+    11→import { api, ApiClientError } from "@/lib/client";
+    12→import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
+    13→import { Loader2, Save, Plus, Trash2, Upload, ArrowUp, ArrowDown } from "lucide-react";
+    14→import { toast } from "@/hooks/use-toast";
+    15→
+    16→// Keep in sync with HERO_IMAGE_LIMIT in lib/settings (importing that file here would
+    17→// pull the Prisma client into the admin client bundle).
+    18→const HERO_IMAGES_MAX = 3;
+    19→
+    20→interface SettingsShape {
+    21→  companyName: string; tagline: string; heroTitle: string; heroSubtitle: string;
+    22→  heroBadge: string; heroPrimaryCtaLabel: string; heroPrimaryCtaHref: string;
+    23→  heroSecondaryCtaLabel: string; heroSecondaryCtaHref: string; heroNote: string;
+    24→  aboutText: string; missionText: string; visionText: string;
+    25→  email: string; phone: string; whatsappNumber: string; address: string;
+    26→  currency: string; taxRate: string;
+    27→  quotationPrefix: string; invoicePrefix: string; projectPrefix: string;
+    28→  quotationTerms: string; invoiceTerms: string;
+    29→}
+    30→
+    31→interface DivisionServiceRow { title: string; description: string }
+    32→interface DivisionRow { code: string; tagline: string; description: string; services: DivisionServiceRow[] }
+    33→
+    34→export default function SettingsPage() {
+    35→  const [form, setForm] = useState<SettingsShape | null>(null);
+    36→  const [services, setServices] = useState<{ title: string; description: string }[]>([]);
+    37→  const [divisions, setDivisions] = useState<DivisionRow[]>([]);
+    38→  const [saving, setSaving] = useState(false);
+    39→  const [error, setError] = useState("");
+    40→  const [heroImages, setHeroImages] = useState<string[]>([]);
+    41→  const [heroImageUrl, setHeroImageUrl] = useState("");
+    42→  const [uploading, setUploading] = useState(false);
+    43→  const heroFileRef = useRef<HTMLInputElement>(null);
+    44→
+    45→  useEffect(() => {
+    46→    api<Record<string, unknown>>("/api/settings").then((d) => {
+    47→      const hero = (d.hero ?? {}) as Record<string, unknown>;
+    48→      setForm({
+    49→        companyName: d.companyName ?? "", tagline: d.tagline ?? "", heroTitle: d.heroTitle ?? "",
+    50→        heroSubtitle: d.heroSubtitle ?? "",
+    51→        heroBadge: hero.badge ?? "",
+    52→        heroPrimaryCtaLabel: hero.primaryCtaLabel ?? "",
+    53→        heroPrimaryCtaHref: hero.primaryCtaHref ?? "",
+    54→        heroSecondaryCtaLabel: hero.secondaryCtaLabel ?? "",
+    55→        heroSecondaryCtaHref: hero.secondaryCtaHref ?? "",
+    56→        heroNote: hero.note ?? "",
+    57→        aboutText: d.aboutText ?? "", missionText: d.missionText ?? "",
+    58→        visionText: d.visionText ?? "", email: d.email ?? "", phone: d.phone ?? "",
+    59→        whatsappNumber: d.whatsappNumber ?? "", address: d.address ?? "", currency: d.currency ?? "KES",
+    60→        taxRate: String(d.taxRate ?? 16), quotationPrefix: d.quotationPrefix ?? "QT",
+    61→        invoicePrefix: d.invoicePrefix ?? "INV", projectPrefix: d.projectPrefix ?? "PRJ",
+    62→        quotationTerms: d.quotationTerms ?? "", invoiceTerms: d.invoiceTerms ?? "",
+    63→      });
+    64→      setServices(Array.isArray(d.services) ? d.services : []);
+    65→      setHeroImages(
+    66→        Array.isArray(hero.images)
+    67→          ? hero.images.filter((v: unknown) => typeof v === "string" && v.trim()).slice(0, HERO_IMAGES_MAX)
+    68→          : []
+    69→      );
+    70→      const resolved = Array.isArray(d.divisions) ? d.divisions : [];
+    71→      setDivisions(
+    72→        DIVISION_CODES.map((code) => {
+    73→          const found = resolved.find((x: { code?: string }) => x.code === code) as
+    74→            | { tagline?: string; description?: string; services?: DivisionServiceRow[] }
+    75→            | undefined;
+    76→          const def = DIVISIONS[code];
+    77→          return {
+    78→            code,
+    79→            tagline: found?.tagline ?? def.defaultTagline,
+    80→            description: found?.description ?? def.defaultDescription,
+    81→            services: Array.isArray(found?.services) && found.services.length > 0
+    82→              ? found.services
+    83→              : def.defaultServices.map((s) => ({ title: s.title, description: s.description })),
+    84→          };
+    85→        })
+    86→      );
+    87→    }).catch((e) => setError(e instanceof ApiClientError ? e.message : "Load failed"));
+    88→  }, []);
+    89→
+    90→  async function handleSave() {
+    91→    if (!form) return;
+    92→    setSaving(true);
+    93→    setError("");
+    94→    try {
+    95→      await api("/api/settings", {
+    96→        method: "PUT",
+    97→        json: {
+    98→          companyName: form.companyName,
+    99→          tagline: form.tagline || null,
+   100→          heroTitle: form.heroTitle || null,
+   101→          heroSubtitle: form.heroSubtitle || null,
+   102→          hero: {
+   103→            badge: form.heroBadge || null,
+   104→            primaryCtaLabel: form.heroPrimaryCtaLabel || null,
+   105→            primaryCtaHref: form.heroPrimaryCtaHref || null,
+   106→            secondaryCtaLabel: form.heroSecondaryCtaLabel || null,
+   107→            secondaryCtaHref: form.heroSecondaryCtaHref || null,
+   108→            note: form.heroNote || null,
+   109→            images: heroImages.slice(0, HERO_IMAGES_MAX),
+   110→          },
+   111→          aboutText: form.aboutText || null,
+   112→          missionText: form.missionText || null,
+   113→          visionText: form.visionText || null,
+   114→          servicesJson: JSON.stringify(services),
+   115→          divisionsJson: JSON.stringify(
+   116→            divisions.map((d) => ({ code: d.code, tagline: d.tagline, description: d.description, services: d.services }))
+   117→          ),
+   118→          email: form.email || null,
+   119→          phone: form.phone || null,
+   120→          whatsappNumber: form.whatsappNumber || null,
+   121→          address: form.address || null,
+   122→          currency: form.currency.toUpperCase().slice(0, 3),
+   123→          taxRate: Number(form.taxRate || 0),
+   124→          quotationPrefix: form.quotationPrefix,
+   125→          invoicePrefix: form.invoicePrefix,
+   126→          projectPrefix: form.projectPrefix,
+   127→          quotationTerms: form.quotationTerms || null,
+   128→          invoiceTerms: form.invoiceTerms || null,
+   129→        },
+   130→      });
+   131→      toast({ title: "Settings saved", description: "Public website content and defaults updated." });
+   132→    } catch (e) {
+   133→      setError(e instanceof ApiClientError ? e.message : "Save failed");
+   134→    } finally {
+   135→      setSaving(false);
+   136→    }
+   137→  }
+   138→
+   139→  if (!form) {
+   140→    return <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
+   141→  }
+   142→
+   143→  const set = (patch: Partial<SettingsShape>) => setForm({ ...form, ...patch });
+   144→  const setDivision = (code: string, patch: Partial<DivisionRow>) =>
+   145→    setDivisions(divisions.map((d) => (d.code === code ? { ...d, ...patch } : d)));
+   146→
+   147→  // --- Hero slider images (no-code) ---
+   148→  function addHeroImageUrl() {
+   149→    const url = heroImageUrl.trim();
+   150→    if (!url) return;
+   151→    if (heroImages.length >= HERO_IMAGES_MAX) {
+   152→      toast({ title: `Up to ${HERO_IMAGES_MAX} images`, description: "Remove one first to add another." });
+   153→      return;
+   154→    }
+   155→    if (!/^(\/|https:\/\/)/i.test(url)) {
+   156→      toast({ title: "Unsupported image link", description: "Use an uploaded path (/uploads/…) or an https:// URL.", variant: "destructive" });
+   157→      return;
+   158→    }
+   159→    if (!heroImages.includes(url)) setHeroImages((imgs) => [...imgs, url].slice(0, HERO_IMAGES_MAX));
+   160→    setHeroImageUrl("");
+   161→  }
+   162→
+   163→  async function uploadHeroImage(file: File) {
+   164→    if (heroImages.length >= HERO_IMAGES_MAX) {
+   165→      toast({ title: `Up to ${HERO_IMAGES_MAX} images`, description: "Remove one first to add another." });
+   166→      return;
+   167→    }
+   168→    setUploading(true);
+   169→    try {
+   170→      const fd = new FormData();
+   171→      fd.append("file", file);
+   172→      const res = await fetch("/api/uploads", { method: "POST", body: fd });
+   173→      const payload = (await res.json().catch(() => null)) as { success?: boolean; data?: { url?: string }; error?: { message?: string } } | null;
+   174→      if (!res.ok || !payload?.success || !payload.data?.url) {
+   175→        throw new Error(payload?.error?.message ?? "Upload failed");
+   176→      }
+   177→      const url = payload.data.url;
+   178→      setHeroImages((imgs) => (imgs.includes(url) || imgs.length >= HERO_IMAGES_MAX ? imgs : [...imgs, url]));
+   179→      toast({ title: "Image uploaded", description: "Click Save All to publish it to the hero slider." });
+   180→    } catch (e) {
+   181→      toast({ title: "Upload failed", description: e instanceof Error ? e.message : "Try a smaller JPEG/PNG/WebP image.", variant: "destructive" });
+   182→    } finally {
+   183→      setUploading(false);
+   184→      if (heroFileRef.current) heroFileRef.current.value = "";
+   185→    }
+   186→  }
+   187→
+   188→  function moveHeroImage(index: number, dir: -1 | 1) {
+   189→    const j = index + dir;
+   190→    if (j < 0 || j >= heroImages.length) return;
+   191→    const next = [...heroImages];
+   192→    [next[index], next[j]] = [next[j], next[index]];
+   193→    setHeroImages(next);
+   194→  }
+   195→
+   196→  return (
+   197→    <div>
+   198→      <PageHeader
+   199→        title="Company Settings"
+   200→        description="Branding, website content, the four divisions, contact details, currency and document numbering. Everything here is configurable — nothing is hard-coded."
+   201→        actions={<Button onClick={handleSave} disabled={saving} className="brand-gradient text-white">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save All</Button>}
+   202→      />
+   203→
+   204→      {error && <p className="mb-4 text-sm text-red-600" role="alert">{error}</p>}
+   205→
+   206→      <div className="grid gap-6 lg:grid-cols-2">
+   207→        <div className="space-y-5">
+   208→          <div className="rounded-lg border border-border p-5 space-y-4">
+   209→            <h3 className="font-semibold">Company identity</h3>
+   210→            <div className="space-y-1.5">
+   211→              <Label htmlFor="s-name">Company name</Label>
+   212→              <Input id="s-name" value={form.companyName} onChange={(e) => set({ companyName: e.target.value })} />
+   213→            </div>
+   214→            <div className="space-y-1.5">
+   215→              <Label htmlFor="s-tagline">Tagline</Label>
+   216→              <Input id="s-tagline" value={form.tagline} onChange={(e) => set({ tagline: e.target.value })} />
+   217→            </div>
+   218→          </div>
+   219→
+   220→          {/* No-code homepage hero editor */}
+   221→          <div className="rounded-lg border border-border p-5 space-y-4">
+   222→            <div>
+   223→              <h3 className="font-semibold">Homepage hero section</h3>
+   224→              <p className="text-xs text-muted-foreground mt-1">
+   225→                Edit the public homepage hero here — no code required. The preview updates as you type; blank fields use
+   226→                the built-in defaults.
+   227→              </p>
+   228→            </div>
+   229→            {/* Live preview — mirrors the public hero, including the image slider */}
+   230→            <div className="brand-gradient hero-glow rounded-xl p-5 text-white overflow-hidden" aria-hidden="true">
+   231→              <div className={heroImages.length > 0 ? "grid items-center gap-4 sm:grid-cols-2" : undefined}>
+   232→                <div>
+   233→                  {form.heroBadge && (
+   234→                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium mb-3 ring-1 ring-white/20">
+   235→                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-green-bright,#00A651)]" />
+   236→                      {form.heroBadge}
+   237→                    </span>
+   238→                  )}
+   239→                  <p className="text-lg font-bold leading-snug tracking-tight line-clamp-2">
+   240→                    {form.heroTitle || "Your hero title appears here"}
+   241→                  </p>
+   242→                  <p className="mt-1.5 text-xs text-white/80 line-clamp-2">
+   243→                    {form.heroSubtitle || "Your hero subtitle appears here."}
+   244→                  </p>
+   245→                  <div className="mt-3 flex flex-wrap gap-2">
+   246→                    <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3.5 py-1.5 text-xs font-semibold">
+   247→                      {form.heroPrimaryCtaLabel || "Request a Free Quote"}
+   248→                    </span>
+   249→                    <span className="inline-flex items-center rounded-full border border-white/40 px-3.5 py-1.5 text-xs font-semibold">
+   250→                      {form.heroSecondaryCtaLabel || "Explore Our Divisions"}
+   251→                    </span>
+   252→                  </div>
+   253→                  {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
+   254→                </div>
+   255→                {heroImages.length > 0 && (
+   256→                  <HeroSlider images={heroImages} intervalMs={2200} controls={false} className="h-40 w-full rounded-2xl" />
+   257→                )}
+   258→              </div>
+   259→            </div>
+   260→            <div className="grid gap-4 lg:grid-cols-2">
+   261→              <div className="space-y-1.5 lg:col-span-2">
+   262→                <Label htmlFor="s-hero-badge">Badge (small pill above the title)</Label>
+   263→                <Input id="s-hero-badge" value={form.heroBadge} placeholder="One Group · Four Specialised Divisions" onChange={(e) => set({ heroBadge: e.target.value })} />
+   264→              </div>
+   265→              <div className="space-y-1.5 lg:col-span-2">
+   266→                <Label htmlFor="s-hero">Title</Label>
+   267→                <Input id="s-hero" value={form.heroTitle} onChange={(e) => set({ heroTitle: e.target.value })} />
+   268→              </div>
+   269→              <div className="space-y-1.5 lg:col-span-2">
+   270→                <Label htmlFor="s-herosub">Subtitle</Label>
+   271→                <Textarea id="s-herosub" rows={2} value={form.heroSubtitle} onChange={(e) => set({ heroSubtitle: e.target.value })} />
+   272→              </div>
+   273→              <div className="space-y-1.5">
+   274→                <Label htmlFor="s-hero-cta1">Primary button text</Label>
+   275→                <Input id="s-hero-cta1" value={form.heroPrimaryCtaLabel} placeholder="Request a Free Quote" onChange={(e) => set({ heroPrimaryCtaLabel: e.target.value })} />
+   276→              </div>
+   277→              <div className="space-y-1.5">
+   278→                <Label htmlFor="s-hero-cta1-link">Primary button link</Label>
+   279→                <Input id="s-hero-cta1-link" value={form.heroPrimaryCtaHref} placeholder="/quote" onChange={(e) => set({ heroPrimaryCtaHref: e.target.value })} />
+   280→              </div>
+   281→              <div className="space-y-1.5">
+   282→                <Label htmlFor="s-hero-cta2">Secondary button text</Label>
+   283→                <Input id="s-hero-cta2" value={form.heroSecondaryCtaLabel} placeholder="Explore Our Divisions" onChange={(e) => set({ heroSecondaryCtaLabel: e.target.value })} />
+   284→              </div>
+   285→              <div className="space-y-1.5">
+   286→                <Label htmlFor="s-hero-cta2-link">Secondary button link</Label>
+   287→                <Input id="s-hero-cta2-link" value={form.heroSecondaryCtaHref} placeholder="/divisions" onChange={(e) => set({ heroSecondaryCtaHref: e.target.value })} />
+   288→              </div>
+   289→              <div className="space-y-1.5 lg:col-span-2">
+   290→                <Label htmlFor="s-hero-note">Small note under the buttons (optional)</Label>
+   291→                <Textarea id="s-hero-note" rows={2} value={form.heroNote} onChange={(e) => set({ heroNote: e.target.value })} />
+   292→              </div>
+   293→
+   294→              {/* Hero slider images — upload/paste, reorder, remove; no code needed */}
+   295→              <div className="space-y-3 lg:col-span-2 border-t border-border pt-4">
+   296→                <div>
+   297→                  <Label>Hero slider images (up to {HERO_IMAGES_MAX})</Label>
+   298→                  <p className="text-xs text-muted-foreground mt-1">
+   299→                    Optional. With images, the hero shows them as a fast auto-sliding carousel framed by an animated
+   300→                    brand glow. Without images, the hero stays text-only. Changes go live after “Save All”.
+   301→                  </p>
+   302→                </div>
+   303→                {heroImages.length > 0 && (
+   304→                  <div className="space-y-2">
+   305→                    {heroImages.map((url, i) => (
+   306→                      <div key={`${url}-${i}`} className="flex items-center gap-3 rounded-md border border-border p-2">
+   307→                        <Image src={url} alt={`Hero image ${i + 1}`} width={96} height={64} className="h-16 w-24 shrink-0 rounded object-cover" />
+   308→                        <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground" title={url}>{url}</span>
+   309→                        <div className="flex shrink-0 items-center gap-0.5">
+   310→                          <Button type="button" variant="ghost" size="icon" aria-label="Move image up" disabled={i === 0} onClick={() => moveHeroImage(i, -1)}>
+   311→                            <ArrowUp className="h-4 w-4" />
+   312→                          </Button>
+   313→                          <Button type="button" variant="ghost" size="icon" aria-label="Move image down" disabled={i === heroImages.length - 1} onClick={() => moveHeroImage(i, 1)}>
+   314→                            <ArrowDown className="h-4 w-4" />
+   315→                          </Button>
+   316→                          <Button type="button" variant="ghost" size="icon" aria-label="Remove image" className="text-red-600 hover:text-red-600" onClick={() => setHeroImages(heroImages.filter((_, idx) => idx !== i))}>
+   317→                            <Trash2 className="h-4 w-4" />
+   318→                          </Button>
+   319→                        </div>
+   320→                      </div>
+   321→                    ))}
+   322→                  </div>
+   323→                )}
+   324→                <div className="flex flex-wrap items-center gap-2">
+   325→                  <input
+   326→                    ref={heroFileRef}
+   327→                    type="file"
+   328→                    accept="image/jpeg,image/png,image/webp"
+   329→                    className="hidden"
+   330→                    onChange={(e) => e.target.files?.[0] && uploadHeroImage(e.target.files[0])}
+   331→                  />
+   332→                  <Button type="button" variant="outline" size="sm" onClick={() => heroFileRef.current?.click()} disabled={uploading || heroImages.length >= HERO_IMAGES_MAX}>
+   333→                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Upload image
+   334→                  </Button>
+   335→                  <div className="flex min-w-[220px] flex-1 items-center gap-2">
+   336→                    <Input
+   337→                      value={heroImageUrl}
+   338→                      onChange={(e) => setHeroImageUrl(e.target.value)}
+   339→                      onKeyDown={(e) => {
+   340→                        if (e.key === "Enter") {
+   341→                          e.preventDefault();
+   342→                          addHeroImageUrl();
+   343→                        }
+   344→                      }}
+   345→                      placeholder="…or paste an image link (/uploads/… or https://)"
+   346→                      aria-label="Image URL"
+   347→                    />
+   348→                    <Button type="button" variant="outline" size="sm" onClick={addHeroImageUrl} disabled={heroImages.length >= HERO_IMAGES_MAX || !heroImageUrl.trim()}>
+   349→                      <Plus className="h-4 w-4" /> Add
+   350→                    </Button>
+   351→                  </div>
+   352→                </div>
+   353→                <p className="text-xs text-muted-foreground">
+   354→                  Uploads accept JPEG/PNG/WebP up to 5MB. The first image shows first; use the arrows to reorder.
+   355→                </p>
+   356→              </div>
+   357→            </div>
+   358→            <p className="text-xs text-muted-foreground">
+   359→              Button links can be a page path (e.g. <code>/quote</code>, <code>/divisions</code>), a section anchor
+   360→              (<code>#services</code>) or a full link (<code>https://…</code>, <code>mailto:…</code>, <code>tel:…</code>).
+   361→              Leave a button text blank to hide that button.
+   362→            </p>
+   363→          </div>
+   364→
+   365→          <div className="rounded-lg border border-border p-5 space-y-4">
+   366→            <h3 className="font-semibold">Contact details (header/footer & WhatsApp)</h3>
+   367→            <div className="grid grid-cols-2 gap-4">
+   368→              <div className="space-y-1.5">
+   369→                <Label htmlFor="s-email">Email</Label>
+   370→                <Input id="s-email" type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} />
+   371→              </div>
+   372→              <div className="space-y-1.5">
+   373→                <Label htmlFor="s-phone">Phone</Label>
+   374→                <Input id="s-phone" value={form.phone} onChange={(e) => set({ phone: e.target.value })} />
+   375→              </div>
+   376→            </div>
+   377→            <div className="grid grid-cols-2 gap-4">
+   378→              <div className="space-y-1.5">
+   379→                <Label htmlFor="s-wa">WhatsApp number</Label>
+   380→                <Input id="s-wa" value={form.whatsappNumber} onChange={(e) => set({ whatsappNumber: e.target.value })} placeholder="+2547XXXXXXXX" />
+   381→              </div>
+   382→              <div className="space-y-1.5">
+   383→                <Label htmlFor="s-addr">Address</Label>
+   384→                <Input id="s-addr" value={form.address} onChange={(e) => set({ address: e.target.value })} />
+   385→              </div>
+   386→            </div>
+   387→            <p className="text-xs text-muted-foreground">Leave any field empty and it will be hidden on the public site instead of showing fake data.</p>
+   388→          </div>
+   389→
+   390→          <div className="rounded-lg border border-border p-5 space-y-4">
+   391→            <h3 className="font-semibold">Finance defaults</h3>
+   392→            <div className="grid grid-cols-2 gap-4">
+   393→              <div className="space-y-1.5">
+   394→                <Label htmlFor="s-currency">Currency code (ISO 4217)</Label>
+   395→                <Input id="s-currency" maxLength={3} value={form.currency} onChange={(e) => set({ currency: e.target.value })} />
+   396→              </div>
+   397→              <div className="space-y-1.5">
+   398→                <Label htmlFor="s-tax">Default tax rate (%)</Label>
+   399→                <Input id="s-tax" type="number" min="0" max="100" step="any" value={form.taxRate} onChange={(e) => set({ taxRate: e.target.value })} />
+   400→              </div>
+   401→            </div>
+   402→            <div className="grid grid-cols-3 gap-4">
+   403→              <div className="space-y-1.5">
+   404→                <Label htmlFor="s-qp">Quote prefix</Label>
+   405→                <Input id="s-qp" value={form.quotationPrefix} onChange={(e) => set({ quotationPrefix: e.target.value })} />
+   406→              </div>
+   407→              <div className="space-y-1.5">
+   408→                <Label htmlFor="s-ip">Invoice prefix</Label>
+   409→                <Input id="s-ip" value={form.invoicePrefix} onChange={(e) => set({ invoicePrefix: e.target.value })} />
+   410→              </div>
+   411→              <div className="space-y-1.5">
+   412→                <Label htmlFor="s-pp">Project prefix</Label>
+   413→                <Input id="s-pp" value={form.projectPrefix} onChange={(e) => set({ projectPrefix: e.target.value })} />
+   414→              </div>
+   415→            </div>
+   416→            <p className="text-xs text-muted-foreground">Changing currency affects new records only — existing records keep their original currency so amounts are never mixed.</p>
+   417→          </div>
+   418→        </div>
+   419→
+   420→        <div className="space-y-5">
+   421→          <div className="rounded-lg border border-border p-5 space-y-4">
+   422→            <h3 className="font-semibold">About page content</h3>
+   423→            <div className="space-y-1.5">
+   424→              <Label htmlFor="s-about">About text</Label>
+   425→              <Textarea id="s-about" rows={5} value={form.aboutText} onChange={(e) => set({ aboutText: e.target.value })} />
+   426→            </div>
+   427→            <div className="grid grid-cols-2 gap-4">
+   428→              <div className="space-y-1.5">
+   429→                <Label htmlFor="s-mission">Mission</Label>
+   430→                <Textarea id="s-mission" rows={3} value={form.missionText} onChange={(e) => set({ missionText: e.target.value })} />
+   431→              </div>
+   432→              <div className="space-y-1.5">
+   433→                <Label htmlFor="s-vision">Vision</Label>
+   434→                <Textarea id="s-vision" rows={3} value={form.visionText} onChange={(e) => set({ visionText: e.target.value })} />
+   435→              </div>
+   436→            </div>
+   437→          </div>
+   438→
+   439→          <div className="rounded-lg border border-border p-5 space-y-3">
+   440→            <h3 className="font-semibold">Other group-wide services</h3>
+   441→            <p className="text-xs text-muted-foreground">Shown in an extra section of the public Services page. Per-division service catalogues are edited in the Divisions section below.</p>
+   442→            {services.map((svc, i) => (
+   443→              <div key={i} className="grid gap-2 rounded-md border border-border p-3">
+   444→                <Input value={svc.title} onChange={(e) => setServices(services.map((s, idx) => (idx === i ? { ...s, title: e.target.value } : s)))} placeholder="Service title" />
+   445→                <Textarea rows={2} value={svc.description} onChange={(e) => setServices(services.map((s, idx) => (idx === i ? { ...s, description: e.target.value } : s)))} placeholder="Service description" />
+   446→                <Button variant="ghost" size="sm" className="self-start text-red-600" onClick={() => setServices(services.filter((_, idx) => idx !== i))}>
+   447→                  Remove service
+   448→                </Button>
+   449→              </div>
+   450→            ))}
+   451→            <Button variant="outline" size="sm" onClick={() => setServices([...services, { title: "", description: "" }])}>
+   452→              Add service
+   453→            </Button>
+   454→          </div>
+   455→
+   456→          <div className="rounded-lg border border-border p-5 space-y-4">
+   457→            <h3 className="font-semibold">Document terms</h3>
+   458→            <div className="space-y-1.5">
+   459→              <Label htmlFor="s-qterms">Quotation terms</Label>
+   460→              <Textarea id="s-qterms" rows={3} value={form.quotationTerms} onChange={(e) => set({ quotationTerms: e.target.value })} />
+   461→            </div>
+   462→            <div className="space-y-1.5">
+   463→              <Label htmlFor="s-iterms">Invoice terms</Label>
+   464→              <Textarea id="s-iterms" rows={3} value={form.invoiceTerms} onChange={(e) => set({ invoiceTerms: e.target.value })} />
+   465→            </div>
+   466→          </div>
+   467→        </div>
+   468→      </div>
+   469→
+   470→      {/* Divisions — the four business branches */}
+   471→      <div className="mt-8">
+   472→        <h3 className="text-lg font-semibold mb-1">Divisions (four business branches)</h3>
+   473→        <p className="text-sm text-muted-foreground mb-4">
+   474→          These feed the public Divisions pages, homepage cards, header menu, Services page and the division selector on
+   475→          the quote form. Each division has a tagline, description and its service catalogue.
+   476→        </p>
+   477→        <div className="grid gap-6">
+   478→          {divisions.map((d) => (
+   479→            <div key={d.code} className="rounded-lg border border-border p-5 space-y-4">
+   480→              <div className="flex items-center justify-between gap-3 flex-wrap">
+   481→                <h4 className="font-semibold text-primary">{DIVISIONS[d.code as keyof typeof DIVISIONS].fullName}</h4>
+   482→                <span className="text-xs text-muted-foreground">{d.code}</span>
+   483→              </div>
+   484→              <div className="grid gap-4 lg:grid-cols-2">
+   485→                <div className="space-y-1.5">
+   486→                  <Label htmlFor={`d-tag-${d.code}`}>Tagline</Label>
+   487→                  <Input id={`d-tag-${d.code}`} value={d.tagline} onChange={(e) => setDivision(d.code, { tagline: e.target.value })} />
+   488→                </div>
+   489→                <div className="space-y-1.5">
+   490→                  <Label htmlFor={`d-desc-${d.code}`}>Description (shown on division page & overview)</Label>
+   491→                  <Textarea id={`d-desc-${d.code}`} rows={3} value={d.description} onChange={(e) => setDivision(d.code, { description: e.target.value })} />
+   492→                </div>
+   493→              </div>
+   494→              <div className="space-y-2">
+   495→                <Label>Service catalogue</Label>
+   496→                {d.services.map((svc, i) => (
+   497→                  <div key={i} className="grid gap-2 rounded-md border border-border p-3">
+   498→                    <div className="flex gap-2">
+   499→                      <Input value={svc.title} onChange={(e) => setDivision(d.code, { services: d.services.map((s, idx) => (idx === i ? { ...s, title: e.target.value } : s)) })} placeholder="Service title" />
+   500→                      <Button variant="ghost" size="icon" className="shrink-0 text-red-600" aria-label="Remove service" onClick={() => setDivision(d.code, { services: d.services.filter((_, idx) => idx !== i) })}>
+   501→                        <Trash2 className="h-4 w-4" />
+   502→                      </Button>
+   503→                    </div>
+   504→                    <Textarea rows={2} value={svc.description} onChange={(e) => setDivision(d.code, { services: d.services.map((s, idx) => (idx === i ? { ...s, description: e.target.value } : s)) })} placeholder="Service description" />
+   505→                  </div>
+   506→                ))}
+   507→                <Button variant="outline" size="sm" onClick={() => setDivision(d.code, { services: [...d.services, { title: "", description: "" }] })}>
+   508→                  <Plus className="h-4 w-4" /> Add service to {DIVISIONS[d.code as keyof typeof DIVISIONS].shortName}
+   509→                </Button>
+   510→              </div>
+   511→            </div>
+   512→          ))}
+   513→        </div>
+   514→      </div>
+   515→    </div>
+   516→  );
+   517→}
+   518→

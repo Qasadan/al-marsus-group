@@ -221,3 +221,25 @@ Work Log:
 
 Stage Summary:
 - Header brand lockup now reads logo + "Al-Marsus / GROUP LTD" in both themes and on mobile, driven by the settings companyName (admin-editable, no code). No functional changes; 73/73 tests, lint clean. Committed 6fa637c.
+
+---
+Task ID: 18
+Agent: main
+Task: User request — hero slider should accept at least 10 images sliding after each other in milliseconds
+
+Work Log:
+- Image cap 3 → 12 across the stack: HERO_IMAGE_LIMIT (lib/settings) drives parseHero slice + API zod .max + message; admin HERO_IMAGES_MAX=12 drives UI guards/toasts/save; "at least 10" satisfied with headroom
+- New HeroContent.intervalMs (number|null): parseHero clamps 200–10000; API heroSchema adds z.number().int().min(200).max(10000).nullable().optional(); HERO_KEYS typing excludes images+intervalMs (string loop untouched)
+- HeroSlider: default intervalMs 3000 → 800 (fast by default); timer floor 1200 → 200; crossfade now scales with pace (fadeMs = clamp(intervalMs*0.45, 250–700)) so fast slides don't smear
+- Admin settings: new "Slide speed — milliseconds per image (200–10000)" number input in the hero images card (blank = 800 default), clampedSlideMs shared by save + WYSIWYG preview (preview runs at the exact configured speed); loads from hero.intervalMs
+- Homepage passes hero.intervalMs to HeroSlider; null → 800ms default, so existing heroes become fast with zero admin action
+- TOOLING DISCOVERY: literal bracket-h sequences are stripped from agent tool-call text in BOTH directions — earlier "const eroImages" corruption seen in sed/cat/python-repr/git-show output was a DISPLAY artifact, not real file damage (esbuild parses clean; builds always passed). Two investigation scripts matched nothing and changed nothing; deleted. Working around it: avoid typing bracket-h literals (verify with esbuild/tsc, not visual inspection)
+- tsc --noEmit: 31 errors before AND after (pre-existing, next.config ignoreBuildErrors:true) — zero new errors introduced; lint clean
+- API validation (curl as admin): 10 images + intervalMs 400 → 200 live; 13 images → 422; intervalMs 150 → 422
+- Browser E2E: homepage with 10 images → 10 dot controls, no overflow, auto-advance sampled 4.2s: "4,5,6,7,7,8,9,0,0,1,2,3,3,4" ≈ 400ms cadence; admin login → settings → speed field shows 400 (min 200/max 10000) → set 600 via UI → Save All → GET shows intervalMs 600 (needed el.click() workaround for the known agent-browser button race); restored afterwards
+- User content preserved: hero backed up before tests and restored exactly (their 3 uploaded images, intervalMs null → default fast speed)
+- Isolated prod build (NEXT_DIST_DIR=.next-prodcheck): compiled, route table complete; cp step fails only because platform build.sh hardcodes .next path (known, not a compile issue); standalone smoke on :3001 — /, /divisions, /divisions/mep-engineering, /projects, /quote, /login, /api/health all 200 with hero-slider + glow-frame + 3 tabs in prod HTML; tsconfig auto-edit reverted; artifacts removed
+- Evidence: download/preview/63 (10-slide light), 64 (10-slide dark), 65 (restored 3-image hero)
+
+Stage Summary:
+- Hero slider now takes up to 12 images and slides at millisecond pace: admins set ms/slide (200–10000) in Admin → Settings with a live preview; default 800ms makes every hero fast out of the box. Validation hardened (13th image and sub-200ms rejected 422). User's existing hero content restored byte-identical. 73/73 tests, lint clean, zero new tsc errors, prod build + standalone smoke verified. Committed 34c2d16.
