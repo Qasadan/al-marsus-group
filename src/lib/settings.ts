@@ -9,14 +9,16 @@ export interface HeroContent {
   secondaryCtaLabel: string | null;
   secondaryCtaHref: string | null;
   note: string | null;
-  /** Up to 3 image URLs — rendered as a fast auto-sliding, glow-framed carousel. */
+  /** Up to 12 image URLs — rendered as a fast auto-sliding, glow-framed carousel. */
   images: string[];
+  /** Auto-advance speed in milliseconds (200–10000); null → the slider's default (800ms). */
+  intervalMs: number | null;
 }
 
-export const HERO_IMAGE_LIMIT = 3;
+export const HERO_IMAGE_LIMIT = 12;
 
-/** String-valued hero fields (images is an array and is parsed separately). */
-const HERO_KEYS: Exclude<keyof HeroContent, "images">[] = [
+/** String-valued hero fields (images and intervalMs are parsed separately). */
+const HERO_KEYS: Exclude<keyof HeroContent, "images" | "intervalMs">[] = [
   "badge",
   "primaryCtaLabel",
   "primaryCtaHref",
@@ -35,6 +37,7 @@ function parseHero(json: unknown): HeroContent {
     secondaryCtaHref: null,
     note: null,
     images: [],
+    intervalMs: null,
   };
   if (typeof json !== "string" || !json) return hero;
   try {
@@ -49,6 +52,9 @@ function parseHero(json: unknown): HeroContent {
           .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
           .map((v) => v.trim())
           .slice(0, HERO_IMAGE_LIMIT);
+      }
+      if (typeof parsed.intervalMs === "number" && Number.isFinite(parsed.intervalMs)) {
+        hero.intervalMs = Math.min(10000, Math.max(200, Math.round(parsed.intervalMs)));
       }
     }
   } catch {

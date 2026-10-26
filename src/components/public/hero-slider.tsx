@@ -5,13 +5,14 @@ import Image from "next/image";
 
 /**
  * Hero image slider — no-code content managed in Admin → Settings.
- * Fast auto-advance crossfade between up to 3 images, brand glow frame
- * (.glow-frame breathes; .glow-border sweeps a comet on hover), dot controls.
+ * Fast auto-advance crossfade between up to 12 images at a millisecond-tunable
+ * pace (admin sets ms/slide; default 800ms), brand glow frame (.glow-frame
+ * breathes; .glow-border sweeps a comet on hover), dot controls.
  * Auto-advance pauses while hovered/focused so visitors can look (or click a dot).
  */
 export function HeroSlider({
   images,
-  intervalMs = 3000,
+  intervalMs = 800,
   className = "",
   priorityFirst = false,
   controls = true,
@@ -28,10 +29,13 @@ export function HeroSlider({
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  // Crossfade length scales with the slide pace so very fast intervals don't smear.
+  const fadeMs = Math.min(700, Math.max(250, Math.round(intervalMs * 0.45)));
+
   // Restart the timer whenever the pause state, speed or slide count changes.
   useEffect(() => {
     if (paused || images.length < 2) return;
-    const id = setInterval(() => setActive((i) => (i + 1) % images.length), Math.max(1200, intervalMs));
+    const id = setInterval(() => setActive((i) => (i + 1) % images.length), Math.max(200, intervalMs));
     return () => clearInterval(id);
   }, [paused, intervalMs, images.length]);
 
@@ -51,8 +55,8 @@ export function HeroSlider({
         <div
           key={`${src}-${i}`}
           aria-hidden={i !== active}
-          className="absolute inset-0 transition-opacity duration-700 ease-in-out"
-          style={{ opacity: i === active ? 1 : 0 }}
+          className="absolute inset-0 transition-opacity ease-in-out"
+          style={{ opacity: i === active ? 1 : 0, transitionDuration: `${fadeMs}ms` }}
         >
           <Image
             src={src}

@@ -100,6 +100,7 @@ export default async function HomePage() {
               <div className="absolute inset-0 z-[1]">
                 <HeroSlider
                   images={heroImages}
+                  intervalMs={hero.intervalMs ?? undefined}
                   priorityFirst
                   className="h-full w-full rounded-none"
                 />

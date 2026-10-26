@@ -34,6 +34,7 @@ const heroSchema = z
     secondaryCtaHref: heroLink.nullable().optional(),
     note: z.string().max(300).nullable().optional(),
     images: z.array(heroImage).max(HERO_IMAGE_LIMIT, `Up to ${HERO_IMAGE_LIMIT} hero images`).nullable().optional(),
+    intervalMs: z.number().int().min(200).max(10000).nullable().optional(),
   })
   .strict();
 

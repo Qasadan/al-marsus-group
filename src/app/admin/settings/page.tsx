@@ -15,7 +15,9 @@ import { toast } from "@/hooks/use-toast";
 
 // Keep in sync with HERO_IMAGE_LIMIT in lib/settings (importing that file here would
 // pull the Prisma client into the admin client bundle).
-const HERO_IMAGES_MAX = 3;
+const HERO_IMAGES_MAX = 12;
+const SLIDE_MS_MIN = 200;
+const SLIDE_MS_MAX = 10000;
 
 interface SettingsShape {
   companyName: string; tagline: string; heroTitle: string; heroSubtitle: string;
@@ -39,6 +41,7 @@ export default function SettingsPage() {
   const [error, setError] = useState("");
   const [heroImages, setHeroImages] = useState<string[]>([]);
   const [heroImageUrl, setHeroImageUrl] = useState("");
+  const [slideMs, setSlideMs] = useState("");
   const [uploading, setUploading] = useState(false);
   const heroFileRef = useRef<HTMLInputElement>(null);
 
@@ -67,6 +70,7 @@ export default function SettingsPage() {
           ? hero.images.filter((v: unknown) => typeof v === "string" && v.trim()).slice(0, HERO_IMAGES_MAX)
           : []
       );
+      setSlideMs(hero.intervalMs != null ? String(hero.intervalMs) : "");
       const resolved = Array.isArray(d.divisions) ? d.divisions : [];
       setDivisions(
         DIVISION_CODES.map((code) => {
@@ -107,6 +111,7 @@ export default function SettingsPage() {
             secondaryCtaHref: form.heroSecondaryCtaHref || null,
             note: form.heroNote || null,
             images: heroImages.slice(0, HERO_IMAGES_MAX),
+            intervalMs: clampedSlideMs,
           },
           aboutText: form.aboutText || null,
           missionText: form.missionText || null,
@@ -145,6 +150,14 @@ export default function SettingsPage() {
     setDivisions(divisions.map((d) => (d.code === code ? { ...d, ...patch } : d)));
 
   // --- Hero slider images (no-code) ---
+  // Slide interval in milliseconds, clamped to the same range the API enforces.
+  // null (blank field) → the slider's fast default (800ms).
+  const nSlideMs = Number(slideMs);
+  const clampedSlideMs =
+    slideMs.trim() !== "" && Number.isFinite(nSlideMs)
+      ? Math.min(SLIDE_MS_MAX, Math.max(SLIDE_MS_MIN, Math.round(nSlideMs)))
+      : null;
+
   function addHeroImageUrl() {
     const url = heroImageUrl.trim();
     if (!url) return;
@@ -253,7 +266,12 @@ export default function SettingsPage() {
                   {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
                 </div>
                 {heroImages.length > 0 && (
-                  <HeroSlider images={heroImages} intervalMs={2200} controls={false} className="h-40 w-full rounded-2xl" />
+                  <HeroSlider
+                    images={heroImages}
+                    intervalMs={clampedSlideMs ?? undefined}
+                    controls={false}
+                    className="h-40 w-full rounded-2xl"
+                  />
                 )}
               </div>
             </div>
@@ -299,6 +317,23 @@ export default function SettingsPage() {
                     Optional. With images, the hero shows them as a fast auto-sliding carousel framed by an animated
                     brand glow. Without images, the hero stays text-only. Changes go live after “Save All”.
                   </p>
+                  <div className="mt-3 max-w-xs space-y-1.5">
+                    <Label htmlFor="s-hero-speed">Slide speed — milliseconds per image ({SLIDE_MS_MIN}–{SLIDE_MS_MAX})</Label>
+                    <Input
+                      id="s-hero-speed"
+                      type="number"
+                      min={SLIDE_MS_MIN}
+                      max={SLIDE_MS_MAX}
+                      step={100}
+                      value={slideMs}
+                      placeholder="800 = fast (default)"
+                      onChange={(e) => setSlideMs(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      How long each image stays before sliding to the next. Lower = faster; leave blank for the
+                      800&nbsp;ms default. The preview above runs at this exact speed.
+                    </p>
+                  </div>
                 </div>
                 {heroImages.length > 0 && (
                   <div className="space-y-2">
