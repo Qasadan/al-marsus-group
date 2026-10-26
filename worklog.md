@@ -206,3 +206,18 @@ Work Log:
 
 Stage Summary:
 - Public site now mirrors the kaaftoon.com (Ecohub) design language: Yantramanav type, green #26AC47 on white/mint with dark eco bands, topbar+centered-nav header, split hero with green hotline box and the admin-managed glow slider, blob division cards, dark featured/stats bands with amber counters, wavy dark footer — while dark mode, glow animations, no-code hero editor and ALL functionality (73/73 tests, auth, APIs, admin) remain intact. Admin recolored green for cohesion, zero functional changes.
+
+---
+Task ID: 17
+Agent: main
+Task: User request — company name missing between logo and Home nav in header; add it
+
+Work Log:
+- site-header.tsx logo Link previously rendered only the logo image; added a two-line wordmark lockup next to it: first word of companyName in extrabold ("Al-Marsus") + remainder as small uppercase green kicker ("GROUP LTD"), adapting to any name configured in admin settings (single-word names render name only)
+- Uses existing companyName prop (DB settings → PublicShell/portal), text-foreground + brand-green/bright vars so it themes correctly in light+dark; min-w-0 guards against overflow
+- Verified via agent-browser: lockup renders between logo and nav on desktop light (59) + dark (60), mobile 390px light (61) + dark (62); scrollWidth 390 = innerWidth on mobile (no overflow); theme restored to light after tests
+- Regression: bun run lint clean; scripts/api-tests.ts 73/73 passed
+- Evidence: download/preview/59-62
+
+Stage Summary:
+- Header brand lockup now reads logo + "Al-Marsus / GROUP LTD" in both themes and on mobile, driven by the settings companyName (admin-editable, no code). No functional changes; 73/73 tests, lint clean. Committed 6fa637c.
