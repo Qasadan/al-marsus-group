@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/public/public-shell";
+import { PageHero } from "@/components/public/page-hero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,12 +10,11 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <PublicShell>
-      <section className="brand-gradient text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-          <h1 className="text-4xl font-bold">Privacy Policy</h1>
-          <p className="mt-3 text-white/80">Last updated: {new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long" })}</p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Legal"
+        title="Privacy Policy"
+        description={`Last updated: ${new Date().toLocaleDateString("en-GB", { year: "numeric", month: "long" })}`}
+      />
       <section className="mx-auto max-w-3xl px-4 sm:px-6 py-14 space-y-8 text-sm leading-relaxed text-foreground/85">
         <div>
           <h2 className="text-xl font-bold text-primary mb-2">1. Information we collect</h2>

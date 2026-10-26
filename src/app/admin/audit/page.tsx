@@ -68,7 +68,7 @@ export default function AuditPage() {
           {items.map((a) => (
             <div key={a.id} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3.5">
               <div className="rounded-lg bg-secondary p-2 shrink-0">
-                <ScrollText className="h-4 w-4 text-[var(--brand-indigo)]" />
+                <ScrollText className="h-4 w-4 text-primary" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">

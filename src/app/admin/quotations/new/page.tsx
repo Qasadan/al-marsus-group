@@ -215,7 +215,7 @@ export default function NewQuotationPage() {
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatMoneyDisplay(subtotal, currency)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span>-{formatMoneyDisplay(discountC, currency)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span>{formatMoneyDisplay(taxC, currency)}</span></div>
-              <div className="flex justify-between border-t border-border pt-1.5 font-bold"><span>Total</span><span className="text-[var(--brand-indigo)]">{formatMoneyDisplay(total, currency)}</span></div>
+              <div className="flex justify-between border-t border-border pt-1.5 font-bold"><span>Total</span><span className="text-primary">{formatMoneyDisplay(total, currency)}</span></div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="n-notes">Notes</Label>

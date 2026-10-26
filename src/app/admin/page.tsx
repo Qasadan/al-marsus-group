@@ -62,14 +62,14 @@ export default function DashboardPage() {
   }
 
   const cards = [
-    { label: "Customers", value: stats.customers, icon: Users, href: "/admin/customers", color: "text-[var(--brand-indigo)]" },
+    { label: "Customers", value: stats.customers, icon: Users, href: "/admin/customers", color: "text-primary" },
     { label: "Active Projects", value: stats.activeProjects, icon: FolderKanban, href: "/admin/projects", color: "text-[var(--brand-green)]" },
-    { label: "Open Leads", value: stats.openLeads, icon: Target, href: "/admin/leads", color: "text-[var(--brand-indigo)]" },
+    { label: "Open Leads", value: stats.openLeads, icon: Target, href: "/admin/leads", color: "text-primary" },
     { label: "New Quote Requests", value: stats.newQuoteRequests, icon: ClipboardList, href: "/admin/quote-requests", color: "text-[var(--brand-green)]" },
-    { label: "Scheduled Surveys", value: stats.scheduledSurveys, icon: ClipboardList, href: "/admin/surveys", color: "text-[var(--brand-indigo)]" },
+    { label: "Scheduled Surveys", value: stats.scheduledSurveys, icon: ClipboardList, href: "/admin/surveys", color: "text-primary" },
     { label: "Pending Quotations", value: stats.pendingQuotations, icon: FileText, href: "/admin/quotations", color: "text-[var(--brand-green)]" },
     { label: "Low Stock Items", value: stats.lowStockCount, icon: Package, href: "/admin/inventory?lowStock=true", color: "text-red-600" },
-    { label: "Open Service Requests", value: stats.openServiceRequests, icon: LifeBuoy, href: "/admin/service-requests", color: "text-[var(--brand-indigo)]" },
+    { label: "Open Service Requests", value: stats.openServiceRequests, icon: LifeBuoy, href: "/admin/service-requests", color: "text-primary" },
   ];
 
   return (
@@ -109,7 +109,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2"><TrendingUp className="h-4 w-4" /> Outstanding</CardTitle></CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-[var(--brand-indigo)]">{formatMoneyDisplay(stats.outstandingCents, currency)}</p>
+            <p className="text-2xl font-bold text-primary">{formatMoneyDisplay(stats.outstandingCents, currency)}</p>
             <p className="text-xs text-muted-foreground mt-1">{stats.outstandingInvoicesCount} unpaid invoice(s)</p>
           </CardContent>
         </Card>

@@ -121,7 +121,7 @@ export default function QuotationDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[var(--brand-indigo)]">{qt.quoteNumber}</h1>
+            <h1 className="text-2xl font-bold text-primary">{qt.quoteNumber}</h1>
             <StatusBadge status={qt.status} />
           </div>
           <p className="text-sm text-muted-foreground mt-1">{qt.title} · {qt.customer.name}</p>
@@ -189,7 +189,7 @@ export default function QuotationDetailPage() {
             <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span>-{formatMoneyDisplay(qt.discountCents, cur)}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Tax ({qt.taxRate}%)</span><span>{formatMoneyDisplay(qt.taxCents, cur)}</span></div>
             <div className="flex justify-between border-t border-border pt-2.5 text-base font-bold">
-              <span>Total</span><span className="text-[var(--brand-indigo)]">{formatMoneyDisplay(qt.totalCents, cur)}</span>
+              <span>Total</span><span className="text-primary">{formatMoneyDisplay(qt.totalCents, cur)}</span>
             </div>
             <p className="text-xs text-muted-foreground pt-1">Totals are calculated server-side from line items.</p>
           </div>

@@ -136,7 +136,7 @@ export default function ServiceRequestsPage() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-[var(--brand-indigo)]">{sr.code}</span>
+                    <span className="font-semibold text-primary">{sr.code}</span>
                     <StatusBadge status={sr.status} />
                     <StatusBadge status={sr.priority} />
                   </div>

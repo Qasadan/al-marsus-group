@@ -39,7 +39,7 @@ export function HeroSlider({
 
   return (
     <div
-      className={`glow-frame glow-border group relative overflow-hidden rounded-2xl ${className}`}
+      className={`glow-frame glow-border group relative overflow-hidden ${className}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -79,7 +79,7 @@ export function HeroSlider({
               onClick={() => setActive(i)}
               className={`h-2.5 rounded-full transition-all duration-300 ${
                 i === active
-                  ? "w-6 bg-white shadow-[0_0_10px_2px_rgba(0,166,81,0.65)]"
+                  ? "w-6 bg-white shadow-[0_0_10px_2px_rgba(38,172,71,0.65)]"
                   : "w-2.5 bg-white/55 hover:bg-white/85"
               }`}
             />

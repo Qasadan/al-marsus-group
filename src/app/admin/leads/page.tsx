@@ -174,7 +174,7 @@ export default function LeadsPage() {
                   <td className="px-4 py-3">
                     <div className="font-medium">{l.name}</div>
                     <div className="text-xs text-muted-foreground">{l.phone}{l.email ? ` · ${l.email}` : ""}</div>
-                    {l.division && <div className="mt-1"><span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">{divisionLabel(l.division)}</span></div>}
+                    {l.division && <div className="mt-1"><span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-primary">{divisionLabel(l.division)}</span></div>}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{l.source.replace("_", " ")}</td>
                   <td className="px-4 py-3">

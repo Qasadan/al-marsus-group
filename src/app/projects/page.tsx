@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PublicShell } from "@/components/public/public-shell";
+import { PageHero } from "@/components/public/page-hero";
 import { db } from "@/lib/db";
 import { DIVISION_LIST, divisionLabel } from "@/lib/divisions";
 import type { Metadata } from "next";
@@ -25,14 +26,11 @@ export default async function ProjectsPage({
 
   return (
     <PublicShell>
-      <section className="brand-gradient text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-          <h1 className="text-4xl font-bold">Our Projects</h1>
-          <p className="mt-3 text-white/80 max-w-2xl">
-            A portfolio of work across the group&apos;s divisions. Projects are published by the company after handover.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Portfolio"
+        title="Latest Projects"
+        description="A portfolio of work across the group's divisions. Projects are published by the company after handover."
+      />
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14">
         {/* Division filter */}
         <div className="flex flex-wrap gap-2 mb-8" role="navigation" aria-label="Filter projects by division">
@@ -40,8 +38,8 @@ export default async function ProjectsPage({
             href="/projects"
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               !selected
-                ? "brand-gradient text-white"
-                : "border border-border bg-card text-muted-foreground hover:text-primary hover:bg-muted"
+                ? "brand-gradient text-white shadow-sm"
+                : "border border-border bg-card text-muted-foreground hover:text-[var(--brand-green)] hover:bg-secondary"
             }`}
           >
             All divisions
@@ -52,8 +50,8 @@ export default async function ProjectsPage({
               href={`/projects?division=${d.slug}`}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 selected?.code === d.code
-                  ? "brand-gradient text-white"
-                  : "border border-border bg-card text-muted-foreground hover:text-primary hover:bg-muted"
+                  ? "brand-gradient text-white shadow-sm"
+                  : "border border-border bg-card text-muted-foreground hover:text-[var(--brand-green)] hover:bg-secondary"
               }`}
             >
               {d.shortName}
@@ -64,14 +62,14 @@ export default async function ProjectsPage({
         {gallery.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {gallery.map((item) => (
-              <article key={item.id} className="rounded-xl overflow-hidden border border-border bg-card">
+              <article key={item.id} className="glow-soft group overflow-hidden rounded-xl border border-border bg-card">
                 <div className="relative aspect-[4/3] bg-muted">
                   <Image
                     src={item.imageUrl}
                     alt={item.title}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <div className="p-5">
@@ -94,7 +92,7 @@ export default async function ProjectsPage({
                   </div>
                   <h2 className="font-semibold">{item.title}</h2>
                   {item.description && <p className="mt-1.5 text-sm text-muted-foreground">{item.description}</p>}
-                  {item.location && <p className="mt-2 text-xs text-muted-foreground">📍 {item.location}</p>}
+                  {item.location && <p className="mt-2 text-xs text-muted-foreground">{item.location}</p>}
                 </div>
               </article>
             ))}

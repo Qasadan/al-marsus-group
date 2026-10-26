@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PublicShell } from "@/components/public/public-shell";
+import { PageHero } from "@/components/public/page-hero";
 import { getPublicSettings } from "@/lib/settings";
 import { Zap, Cpu, HardHat, Snowflake, ArrowRight, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
@@ -17,15 +18,11 @@ export default async function ServicesPage() {
   const s = await getPublicSettings();
   return (
     <PublicShell>
-      <section className="brand-gradient text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-          <h1 className="text-4xl font-bold">Services</h1>
-          <p className="mt-3 text-white/80 max-w-2xl">
-            Organised by division — from solar and building engineering to software, facility operations and cold
-            chain logistics.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Services"
+        title="What we deliver, division by division"
+        description="Organised by division — from solar and building engineering to software, facility operations and cold chain logistics."
+      />
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14 space-y-14">
         {s.divisions.map((d) => {
@@ -37,7 +34,7 @@ export default async function ServicesPage() {
                   <Icon className="h-6 w-6" />
                 </span>
                 <div className="flex-1">
-                  <h2 className="text-xl font-bold text-primary">{d.fullName}</h2>
+                  <h2 className="text-xl font-bold">{d.fullName}</h2>
                   <p className="text-sm text-muted-foreground">{d.tagline}</p>
                 </div>
                 <Link
@@ -62,7 +59,7 @@ export default async function ServicesPage() {
 
         {s.services.length > 0 && (
           <div>
-            <h2 className="text-xl font-bold text-primary mb-2">Other group-wide services</h2>
+            <h2 className="text-xl font-bold mb-2">Other group-wide services</h2>
             <p className="text-sm text-muted-foreground mb-6">
               Additional services configured by the company in Admin → Settings.
             </p>
@@ -85,7 +82,7 @@ export default async function ServicesPage() {
         <div className="text-center">
           <Link
             href="/quote"
-            className="inline-flex items-center gap-2 rounded-md brand-gradient-green px-6 py-3 text-sm font-semibold text-white hover:opacity-90"
+            className="glow-border inline-flex items-center gap-2 rounded-lg brand-gradient-green px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[var(--brand-green)]/25 hover:opacity-90"
           >
             Request a Quote <ArrowRight className="h-4 w-4" />
           </Link>

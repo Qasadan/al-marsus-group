@@ -30,12 +30,12 @@ export default async function PrintInvoicePage({ params }: { params: Promise<{ i
   return (
     <div className="min-h-screen bg-gray-100 py-8 print:py-0 print:bg-white">
       <div className="print-page mx-auto max-w-3xl bg-white shadow-lg p-10">
-        <div className="flex items-start justify-between border-b-2 border-[var(--brand-indigo)] pb-6">
+        <div className="flex items-start justify-between border-b-2 border-primary pb-6">
           <div className="flex items-center gap-4">
             { }
             <img src={settings.logoUrl} alt={`${settings.companyName} logo`} className="h-16 w-auto" />
             <div>
-              <h1 className="text-xl font-bold text-[var(--brand-indigo)]">{settings.companyName}</h1>
+              <h1 className="text-xl font-bold text-primary">{settings.companyName}</h1>
               <p className="text-xs text-gray-500">{settings.tagline}</p>
               {settings.address && <p className="text-xs text-gray-500">{settings.address}</p>}
               {(settings.phone || settings.email) && (
@@ -95,9 +95,9 @@ export default async function PrintInvoicePage({ params }: { params: Promise<{ i
             <div className="flex justify-between"><span className="text-gray-500">Subtotal</span><span>{formatMoney(invoice.subtotalCents, cur)}</span></div>
             {invoice.discountCents > 0 && <div className="flex justify-between"><span className="text-gray-500">Discount</span><span>-{formatMoney(invoice.discountCents, cur)}</span></div>}
             <div className="flex justify-between"><span className="text-gray-500">Tax ({invoice.taxRate}%)</span><span>{formatMoney(invoice.taxCents, cur)}</span></div>
-            <div className="flex justify-between border-t-2 border-[var(--brand-indigo)] pt-2 text-base font-bold">
+            <div className="flex justify-between border-t-2 border-primary pt-2 text-base font-bold">
               <span>Total</span>
-              <span className="text-[var(--brand-indigo)]">{formatMoney(invoice.totalCents, cur)}</span>
+              <span className="text-primary">{formatMoney(invoice.totalCents, cur)}</span>
             </div>
             <div className="flex justify-between text-green-700"><span>Paid</span><span>{formatMoney(invoice.amountPaidCents, cur)}</span></div>
             <div className="flex justify-between font-bold text-red-700"><span>Balance due</span><span>{formatMoney(outstanding, cur)}</span></div>

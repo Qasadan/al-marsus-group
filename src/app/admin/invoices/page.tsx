@@ -93,7 +93,7 @@ export default function InvoicesPage() {
               {items.map((inv) => (
                 <tr key={inv.id} className="border-b border-border last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-[var(--brand-indigo)] hover:underline">
+                    <Link href={`/admin/invoices/${inv.id}`} className="font-medium text-primary hover:underline">
                       {inv.invoiceNumber}
                     </Link>
                     {inv.project && <div className="text-xs text-muted-foreground">{inv.project.code}</div>}

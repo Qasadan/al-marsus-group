@@ -129,6 +129,8 @@ Evidence: `download/preview/32–38` (desktop light hero, dark desktop, mobile d
 | `bun run build` (Task 10, 2026-10-25) | ✅ **exit 0** — all public pages, API routes, admin pages, print views and middleware compiled; `.next/standalone/server.js` produced with static assets copied |
 | Production smoke test (standalone on :3001) | ✅ `/api/health` healthy + DB connected; `/`, `/divisions`, `/divisions/mep-engineering`, `/quote`, `/services`, `/login` all HTTP 200; home HTML contains "Our Divisions", "MEP Engineering", "Cold Chain" |
 | Supabase/PostgreSQL migration | ⚠️ not executed — no external DB in sandbox; port per DEPLOYMENT.md §2 |
+| Visual redesign to reference design (Task 16, 2026-10-26) | ✅ lint clean; 73/73 E2E; isolated prod build compiled + standalone smoke 200 on 7 routes; browser-verified light/dark × desktop/mobile + hover comet + admin |
+| `bun scripts/api-tests.ts` after Task 16 | ✅ 73 passed, 0 failed |
 
 ## 3. Bugs found & fixed during QA
 
@@ -139,6 +141,7 @@ Evidence: `download/preview/32–38` (desktop light hero, dark desktop, mobile d
 5. Missing `Select` imports in gallery page.
 6. **Production-only login 500** (found 2026-10-25 during live prod smoke test): `getSecret()` threw "JWT_SECRET must be set in production" — dev used a fallback, prod had none, and the platform deploy pipeline sets no `JWT_SECRET`. Fixed at runtime-provisioning level (no app-code change): real `JWT_SECRET` added to sandbox `.env`; bundled `start.sh` now auto-generates and persists a random secret to `<db-dir>/.jwt-secret` (0600) when none is injected. Verified: login 200 + Set-Cookie; Edge middleware accepts the session (`/admin` renders dashboard).
 7. **Admin login "not working" in the preview panel** (reported by user 2026-10-25): server logs showed `POST /api/auth/login 200` followed by a bounce back to `/login?next=/admin` — credentials were valid and the cookie was set, but the browser dropped it. Root cause: the preview renders the site inside a **cross-site iframe**, and browsers reject `SameSite=Lax` cookies in that context. Fix (minimal, `src/lib/auth.ts` only): session cookie attributes changed to `SameSite=None; Secure`. Verified: real browser login lands on `/admin` (top-level AND embedded-frame reproduction via cross-site iframe to the public preview URL — screenshot `download/preview/11-iframe-embed-login-fixed.png`); full 73-assertion suite re-run: 73/73 pass.
+8. **Frontend redesign cascade fixes** (Task 16, 2026-10-26, found during self-verification): (a) `Yantramanav` weight `600` rejected by next/font → build 500, reduced to available weights; (b) `.dark-eco-gradient` used the `background` shorthand so pattern utilities setting `background-image` wiped the gradient (white login page) → solid `background-color` + layered `background-image`; (c) unlayered `.eyebrow { display:inline-block }` beats layered Tailwind `block` utility → division-hero eyebrow sat inline after the back-link, wrapped in a block container; (d) a zero-width space in an eyebrow string removed. All covered by browser screenshots `download/preview/40-58`.
 
 ## 4. Remaining tasks (external to sandbox)
 

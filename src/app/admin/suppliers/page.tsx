@@ -92,7 +92,7 @@ export default function SuppliersPage() {
             <div key={s.id} className={`rounded-lg border border-border p-5 ${!s.isActive ? "opacity-60" : ""}`}>
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-[var(--brand-indigo)]" />
+                  <Truck className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">{s.name}</h3>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => { setEditing(s); setForm({

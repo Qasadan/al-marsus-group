@@ -29,7 +29,7 @@ export default async function PortalPage() {
         <SiteHeader companyName={companyName} logoUrl={logoUrl} />
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
-            <h1 className="text-xl font-bold text-[var(--brand-indigo)]">Welcome, {session.name}</h1>
+            <h1 className="text-xl font-bold text-primary">Welcome, {session.name}</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Your account is not yet linked to a customer record. Please contact the company to complete your portal setup.
             </p>
@@ -68,7 +68,7 @@ export default async function PortalPage() {
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--brand-indigo)]">Customer Portal</h1>
+            <h1 className="text-2xl font-bold text-primary">Customer Portal</h1>
             <p className="text-sm text-muted-foreground">Welcome back, {customer.name}</p>
           </div>
           {outstanding > 0 && (
@@ -81,7 +81,7 @@ export default async function PortalPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Projects */}
           <section className="rounded-xl border border-border bg-card p-5">
-            <h2 className="font-semibold flex items-center gap-2 mb-4"><FolderKanban className="h-4 w-4 text-[var(--brand-indigo)]" /> My Projects</h2>
+            <h2 className="font-semibold flex items-center gap-2 mb-4"><FolderKanban className="h-4 w-4 text-primary" /> My Projects</h2>
             {projects.length === 0 ? (
               <p className="text-sm text-muted-foreground">No projects yet.</p>
             ) : (
@@ -107,7 +107,7 @@ export default async function PortalPage() {
 
           {/* Invoices */}
           <section className="rounded-xl border border-border bg-card p-5">
-            <h2 className="font-semibold flex items-center gap-2 mb-4"><ReceiptText className="h-4 w-4 text-[var(--brand-indigo)]" /> My Invoices</h2>
+            <h2 className="font-semibold flex items-center gap-2 mb-4"><ReceiptText className="h-4 w-4 text-primary" /> My Invoices</h2>
             {invoices.length === 0 ? (
               <p className="text-sm text-muted-foreground">No invoices yet.</p>
             ) : (
@@ -132,7 +132,7 @@ export default async function PortalPage() {
           <section className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
             <div className="grid gap-6 md:grid-cols-2">
               <div>
-                <h2 className="font-semibold flex items-center gap-2 mb-4"><Wrench className="h-4 w-4 text-[var(--brand-indigo)]" /> Service Requests</h2>
+                <h2 className="font-semibold flex items-center gap-2 mb-4"><Wrench className="h-4 w-4 text-primary" /> Service Requests</h2>
                 {serviceRequests.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No service requests yet. Report an issue using the form.</p>
                 ) : (

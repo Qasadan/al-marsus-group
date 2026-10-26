@@ -99,7 +99,7 @@ export default function InvoiceDetailPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-[var(--brand-indigo)]">{invoice.invoiceNumber}</h1>
+            <h1 className="text-2xl font-bold text-primary">{invoice.invoiceNumber}</h1>
             <StatusBadge status={invoice.status} />
           </div>
           <p className="text-sm text-muted-foreground mt-1">{invoice.customer.name}{invoice.project ? ` · ${invoice.project.code}` : ""}</p>

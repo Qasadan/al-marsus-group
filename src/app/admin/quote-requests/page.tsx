@@ -107,7 +107,7 @@ export default function QuoteRequestsPage() {
                     <span className="font-semibold">{r.name}</span>
                     <StatusBadge status={r.status} />
                     {r.division && (
-                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-[var(--brand-indigo)]">
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-primary">
                         {divisionLabel(r.division)}
                       </span>
                     )}

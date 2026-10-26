@@ -88,7 +88,7 @@ export function AdminShell({
   }
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-[var(--brand-indigo-dark)] text-white">
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 h-16 border-b border-white/10">
         <Image src="/images/logo.jpg" alt="Logo" width={36} height={32} className="rounded bg-white/95 p-0.5" />
         <div className="leading-tight">

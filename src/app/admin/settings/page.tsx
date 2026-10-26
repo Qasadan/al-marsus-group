@@ -253,7 +253,7 @@ export default function SettingsPage() {
                   {form.heroNote && <p className="mt-2.5 text-[10px] text-white/60 line-clamp-1">{form.heroNote}</p>}
                 </div>
                 {heroImages.length > 0 && (
-                  <HeroSlider images={heroImages} intervalMs={2200} controls={false} className="h-40 w-full" />
+                  <HeroSlider images={heroImages} intervalMs={2200} controls={false} className="h-40 w-full rounded-2xl" />
                 )}
               </div>
             </div>
@@ -478,7 +478,7 @@ export default function SettingsPage() {
           {divisions.map((d) => (
             <div key={d.code} className="rounded-lg border border-border p-5 space-y-4">
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <h4 className="font-semibold text-[var(--brand-indigo)]">{DIVISIONS[d.code as keyof typeof DIVISIONS].fullName}</h4>
+                <h4 className="font-semibold text-primary">{DIVISIONS[d.code as keyof typeof DIVISIONS].fullName}</h4>
                 <span className="text-xs text-muted-foreground">{d.code}</span>
               </div>
               <div className="grid gap-4 lg:grid-cols-2">

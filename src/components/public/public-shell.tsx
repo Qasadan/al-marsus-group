@@ -12,6 +12,9 @@ export async function PublicShell({ children }: { children: React.ReactNode }) {
         companyName={settings.companyName}
         logoUrl={settings.logoUrl}
         whatsapp={settings.whatsappNumber}
+        email={settings.email}
+        phone={settings.phone}
+        address={settings.address}
       />
       <main className="flex-1">{children}</main>
       <SiteFooter

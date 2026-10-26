@@ -27,7 +27,7 @@ export function PageHeader({
   return (
     <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h1 className="text-2xl font-bold text-[var(--brand-indigo)]">{title}</h1>
+        <h1 className="text-2xl font-bold">{title}</h1>
         {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

@@ -6,7 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* Yantramanav — matches the reference design typography (kaaftoon.com) */
+  --font-sans: var(--font-yantramanav), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -49,85 +50,94 @@
 
 :root {
   --radius: 0.75rem;
-  /* Official brand colors — Al-Marsus Group Ltd */
+  /* Reference palette (kaaftoon.com / Ecohub) — green energy look.
+     The legacy Al-Marsus indigo stays only for charts + logo context. */
   --brand-indigo: #34369B;
   --brand-indigo-dark: #26286E;
-  --brand-green: #00A651;
-  --brand-green-dark: #008541;
-  --brand-green-bright: #00A651;
+  --brand-green: #26AC47;
+  --brand-green-dark: #1D8A39;
+  --brand-green-bright: #26AC47;
+  --brand-mint: #E9F6EE;
+  --brand-cream: #F4F4F4;
+  --brand-ink: #1B1B1B;
+  --brand-body: #757474;
+  --brand-amber: #F9A51A;
+  --brand-footer: #0B110D;
 
   --background: #FFFFFF;
-  --foreground: #1a1b2e;
+  --foreground: #1B1B1B;
   --card: #FFFFFF;
-  --card-foreground: #1a1b2e;
+  --card-foreground: #1B1B1B;
   --popover: #FFFFFF;
-  --popover-foreground: #1a1b2e;
-  /* Primary = brand indigo #34369B */
-  --primary: #34369B;
+  --popover-foreground: #1B1B1B;
+  /* Primary = eco green #26AC47 (reference design primary) */
+  --primary: #26AC47;
   --primary-foreground: #FFFFFF;
-  --secondary: #EEF0F7;
-  --secondary-foreground: #34369B;
-  --muted: #F4F5F9;
-  --muted-foreground: #5d5f72;
-  /* Accent = brand green #00A651 */
-  --accent: #E6F7EF;
-  --accent-foreground: #008541;
+  --secondary: #E9F6EE;
+  --secondary-foreground: #157331;
+  --muted: #F4F4F4;
+  --muted-foreground: #757474;
+  --accent: #E9F6EE;
+  --accent-foreground: #157331;
   --destructive: #dc2626;
   --destructive-foreground: #FFFFFF;
-  --border: #e6e7ef;
-  --input: #d8d9e6;
-  --ring: #34369B;
-  --chart-1: #34369B;
-  --chart-2: #00A651;
-  --chart-3: #7C7DD6;
+  --border: #E4E7E4;
+  --input: #D8DDD8;
+  --ring: #26AC47;
+  --chart-1: #26AC47;
+  --chart-2: #F9A51A;
+  --chart-3: #157331;
   --chart-4: #66C79A;
-  --chart-5: #23245E;
-  --sidebar: #26286E;
-  --sidebar-foreground: #C9CAE8;
+  --chart-5: #34369B;
+  --sidebar: #0F1A13;
+  --sidebar-foreground: #C6D5CB;
   --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #34369B;
-  --sidebar-accent: #3D3FAF;
+  --sidebar-primary-foreground: #157331;
+  --sidebar-accent: #1A2E21;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #3D3FAF;
-  --sidebar-ring: #00A651;
+  --sidebar-border: #1A2E21;
+  --sidebar-ring: #26AC47;
 }
 
 .dark {
-  --brand-green-bright: #4ecb8d;
-  --background: #0d0e1d;
-  --foreground: #edeef8;
-  --card: #14152a;
-  --card-foreground: #edeef8;
-  --popover: #14152a;
-  --popover-foreground: #edeef8;
-  /* Primary = brand indigo, lightened for dark-surface contrast */
-  --primary: #8b8de3;
-  --primary-foreground: #101128;
-  --secondary: #1e2044;
-  --secondary-foreground: #c9cae8;
-  --muted: #171832;
-  --muted-foreground: #9a9cb8;
-  /* Accent = brand green, brightened for dark surfaces */
-  --accent: #0d2b1f;
-  --accent-foreground: #5fd398;
+  --brand-green-bright: #2FCB57;
+  --brand-mint: #14251A;
+  --brand-cream: #131A15;
+  --brand-ink: #E9EFEA;
+  --brand-body: #9AA79E;
+  --background: #0D120E;
+  --foreground: #E9EFEA;
+  --card: #131A15;
+  --card-foreground: #E9EFEA;
+  --popover: #131A15;
+  --popover-foreground: #E9EFEA;
+  /* Primary = green, brightened for dark-surface contrast */
+  --primary: #2FCB57;
+  --primary-foreground: #07160B;
+  --secondary: #1B2A20;
+  --secondary-foreground: #9FE3B4;
+  --muted: #141B16;
+  --muted-foreground: #9AA79E;
+  --accent: #132B1B;
+  --accent-foreground: #63D98F;
   --destructive: #ef4444;
   --destructive-foreground: #FFFFFF;
-  --border: #262848;
-  --input: #2b2d50;
-  --ring: #8b8de3;
-  --chart-1: #8b8de3;
-  --chart-2: #4ecb8d;
-  --chart-3: #34369B;
-  --chart-4: #00A651;
-  --chart-5: #9a9cb8;
-  --sidebar: #14152a;
-  --sidebar-foreground: #C9CAE8;
+  --border: #24332A;
+  --input: #2A3B30;
+  --ring: #2FCB57;
+  --chart-1: #2FCB57;
+  --chart-2: #F9A51A;
+  --chart-3: #63D98F;
+  --chart-4: #157331;
+  --chart-5: #9AA79E;
+  --sidebar: #101511;
+  --sidebar-foreground: #C6D5CB;
   --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #34369B;
-  --sidebar-accent: #1e2044;
-  --sidebar-accent-foreground: #edeef8;
-  --sidebar-border: #262848;
-  --sidebar-ring: #00A651;
+  --sidebar-primary-foreground: #157331;
+  --sidebar-accent: #1A2E21;
+  --sidebar-accent-foreground: #E9EFEA;
+  --sidebar-border: #1A2E21;
+  --sidebar-ring: #2FCB57;
 }
 
 @layer base {
@@ -140,20 +150,69 @@
   html {
     scroll-behavior: smooth;
   }
+  /* Reference design: heavy, tight display headings */
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
 }
 
-/* Brand gradient utilities for the public site */
+/* Brand gradient utilities for the public site (reference green) */
 .brand-gradient {
-  background: linear-gradient(135deg, var(--brand-indigo) 0%, var(--brand-indigo-dark) 100%);
+  background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
 }
 .brand-gradient-green {
   background: linear-gradient(135deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
 }
 .brand-text-gradient {
-  background: linear-gradient(90deg, var(--brand-indigo) 0%, var(--brand-green) 100%);
+  background: linear-gradient(90deg, var(--brand-green) 0%, var(--brand-amber) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Dark eco banner (page heroes, parallax bands) — deep green-black like the
+   reference design's dark parallax sections. The solid color lives in
+   background-color so pattern utilities (bg-dots-dark / bg-grid-lines), which
+   only set background-image, layer on top instead of wiping the gradient. */
+.dark-eco-gradient {
+  background-color: #0B110D;
+  background-image:
+    radial-gradient(720px 340px at 85% 10%, rgba(38, 172, 71, 0.28), transparent 62%),
+    radial-gradient(560px 300px at 8% 95%, rgba(38, 172, 71, 0.14), transparent 60%),
+    linear-gradient(120deg, rgba(11, 17, 13, 0) 0%, rgba(16, 40, 26, 0.9) 55%, rgba(11, 17, 13, 0) 100%);
+}
+
+/* Faint vertical grid lines over white sections (reference hero/cards) */
+.bg-grid-lines {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--brand-ink) 5%, transparent) 1px, transparent 1px);
+  background-size: 120px 100%;
+}
+.dark .bg-grid-lines {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+}
+
+/* Subtle topographic-contour wash for light feature strips */
+.bg-contour {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Cg fill='none' stroke='%231b1b1b' stroke-opacity='0.05' stroke-width='1.2'%3E%3Cpath d='M20 130c0-40 40-70 90-70s90 30 90 70-40 70-90 70-90-30-90-70z'/%3E%3Cpath d='M45 130c0-28 30-50 65-50s65 22 65 50-30 50-65 50-65-22-65-50z'/%3E%3Cpath d='M70 130c0-16 18-30 40-30s40 14 40 30-18 30-40 30-40-14-40-30z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Dotted halftone for dark bands (world-map feel) */
+.bg-dots-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+
+/* Organic blob shape for circular feature imagery */
+.blob-shape {
+  border-radius: 46% 54% 52% 48% / 50% 46% 54% 50%;
+}
+
+/* Green hotline box used on the hero (reference design element) */
+.hotline-box {
+  background: linear-gradient(120deg, var(--brand-green) 0%, var(--brand-green-dark) 100%);
 }
 
 /* Minimal, clean section accents */

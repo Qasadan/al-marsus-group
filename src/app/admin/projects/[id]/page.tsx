@@ -209,7 +209,7 @@ export default function ProjectDetailPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-6">
         <div>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-[var(--brand-indigo)]">{project.code}</h1>
+            <h1 className="text-2xl font-bold text-primary">{project.code}</h1>
             <StatusBadge status={project.status} />
             <StatusBadge status={project.handoverStatus} />
           </div>
@@ -366,7 +366,7 @@ export default function ProjectDetailPage() {
                 <ul className="space-y-2">
                   {project.invoices.map((i) => (
                     <li key={i.id} className="flex items-center justify-between gap-2 text-sm">
-                      <Link href={`/admin/invoices/${i.id}`} className="font-medium text-[var(--brand-indigo)] hover:underline">{i.invoiceNumber}</Link>
+                      <Link href={`/admin/invoices/${i.id}`} className="font-medium text-primary hover:underline">{i.invoiceNumber}</Link>
                       <div className="flex items-center gap-2">
                         <span>{formatMoneyDisplay(i.totalCents, i.currency)}</span>
                         <StatusBadge status={i.status} />
@@ -407,7 +407,7 @@ export default function ProjectDetailPage() {
             {project.quotation && (
               <div className="rounded-lg border border-border p-5 text-sm">
                 <h3 className="font-semibold mb-2">Source quotation</h3>
-                <Link href={`/admin/quotations/${project.quotation.id}`} className="text-[var(--brand-indigo)] hover:underline font-medium">
+                <Link href={`/admin/quotations/${project.quotation.id}`} className="text-primary hover:underline font-medium">
                   {project.quotation.quoteNumber}
                 </Link>
                 <p className="text-muted-foreground mt-1">Total: {formatMoneyDisplay(project.quotation.totalCents, cur)}</p>

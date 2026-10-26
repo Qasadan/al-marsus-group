@@ -97,7 +97,7 @@ export default function QuotationsPage() {
               {items.map((qt) => (
                 <tr key={qt.id} className="border-b border-border last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3">
-                    <Link href={`/admin/quotations/${qt.id}`} className="font-medium text-[var(--brand-indigo)] hover:underline">
+                    <Link href={`/admin/quotations/${qt.id}`} className="font-medium text-primary hover:underline">
                       {qt.quoteNumber}
                     </Link>
                     <div className="text-xs text-muted-foreground">{qt.title} · {qt._count.items} items</div>

@@ -172,7 +172,7 @@ function InvoiceFormInner({
 
         <div className="rounded-md bg-muted p-3 text-sm space-y-1">
           <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatMoneyDisplay(subtotal, currency)}</span></div>
-          <div className="flex justify-between font-bold"><span>Total</span><span className="text-[var(--brand-indigo)]">{formatMoneyDisplay(Math.max(0, subtotal - discountC) + taxC, currency)}</span></div>
+          <div className="flex justify-between font-bold"><span>Total</span><span className="text-primary">{formatMoneyDisplay(Math.max(0, subtotal - discountC) + taxC, currency)}</span></div>
         </div>
       </div>
       <DialogFooter>

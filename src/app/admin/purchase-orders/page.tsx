@@ -90,7 +90,7 @@ export default function PurchaseOrdersPage() {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-[var(--brand-indigo)]">{po.poNumber}</span>
+                      <span className="font-semibold text-primary">{po.poNumber}</span>
                       <StatusBadge status={po.status} />
                     </div>
                     <p className="text-sm text-muted-foreground mt-1">

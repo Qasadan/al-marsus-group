@@ -1,4 +1,5 @@
 import { PublicShell } from "@/components/public/public-shell";
+import { PageHero } from "@/components/public/page-hero";
 import { QuoteForm } from "@/components/public/quote-form";
 import { Mail, Phone, MapPin, MessageCircle, Clock } from "lucide-react";
 import { getPublicSettings } from "@/lib/settings";
@@ -28,14 +29,11 @@ export default async function ContactPage() {
 
   return (
     <PublicShell>
-      <section className="brand-gradient text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
-          <h1 className="text-4xl font-bold">Contact Us</h1>
-          <p className="mt-3 text-white/80 max-w-2xl">
-            Reach out for quotations, support or general questions. We respond during business hours.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Contact"
+        title="Contact Us"
+        description="Reach out for quotations, support or general questions. We respond during business hours."
+      />
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14 grid gap-10 lg:grid-cols-5">
         <div className="lg:col-span-2 space-y-4">
