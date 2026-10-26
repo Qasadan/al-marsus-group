@@ -59,6 +59,11 @@ export function SiteHeader({
   const pathname = usePathname();
   const isDivisionRoute = pathname.startsWith("/divisions");
 
+  // Wordmark lockup: first word large, the remainder as a small green kicker
+  // (e.g. "Al-Marsus" + "GROUP LTD"). Adapts to any name set in admin settings.
+  const [nameFirst = "", ...nameRestParts] = companyName.split(" ");
+  const nameRest = nameRestParts.join(" ");
+
   const linkCls = (active: boolean) =>
     `relative px-1 py-2 text-[0.92rem] font-medium transition-colors after:absolute after:inset-x-0 after:bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-[var(--brand-green)] after:transition-transform after:duration-300 hover:text-[var(--brand-green)] ${
       active ? "text-[var(--brand-green)] after:scale-x-100" : "text-foreground/80"
@@ -106,6 +111,14 @@ export function SiteHeader({
           <div className="flex h-[4.5rem] items-center justify-between gap-4">
             <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label={`${companyName} home`}>
               <img src={logoUrl} alt={`${companyName} logo`} className="h-11 w-auto" />
+              <span className="flex min-w-0 flex-col leading-none">
+                <span className="text-lg font-extrabold tracking-tight text-foreground">{nameFirst}</span>
+                {nameRest && (
+                  <span className="mt-1 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[var(--brand-green)] dark:text-[var(--brand-green-bright)]">
+                    {nameRest}
+                  </span>
+                )}
+              </span>
             </Link>
 
             <nav className="hidden items-center gap-7 lg:flex" aria-label="Main navigation">
