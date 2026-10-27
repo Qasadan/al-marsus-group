@@ -243,3 +243,19 @@ Work Log:
 
 Stage Summary:
 - Hero slider now takes up to 12 images and slides at millisecond pace: admins set ms/slide (200–10000) in Admin → Settings with a live preview; default 800ms makes every hero fast out of the box. Validation hardened (13th image and sub-200ms rejected 422). User's existing hero content restored byte-identical. 73/73 tests, lint clean, zero new tsc errors, prod build + standalone smoke verified. Committed 34c2d16.
+
+---
+Task ID: 19
+Agent: main
+Task: User request — hide the staff login from public visitors, make it private
+
+Work Log:
+- Audit: exactly ONE public reference existed — footer Quick Links "Staff Login" (site-footer.tsx); header/nav/mobile drawer had none; no other public pages link /login
+- Removed the footer Staff Login link (Quick Links now 7 public links; 2-col grid renders clean)
+- New src/app/login/layout.tsx (server): metadata robots {index:false, follow:false} → /login serves <meta name="robots" content="noindex, nofollow">, so search engines won't list it; title set to "Staff Login — Al-Marsus Group Ltd"
+- /login stays reachable by direct URL / bookmark / ?next= redirects — staff can still sign in; auth flows untouched
+- Verified: browser body text contains no "Staff Login" anywhere on the homepage (incl. footer + mobile drawer); /login 200 with noindex meta; UI login admin@almarsus.dev → /admin works end-to-end; lint clean; 73/73 E2E suite passes
+- Evidence: download/preview/66-footer-no-staff-login.png
+
+Stage Summary:
+- Staff login is no longer publicly visible or indexable: footer link removed, /login noindexed, direct-URL access preserved for staff. Zero functional changes; 73/73 tests, lint clean. Committed bdc1ee1.
