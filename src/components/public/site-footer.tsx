@@ -117,7 +117,6 @@ export function SiteFooter({
                 <li><Link href="/quote" className="hover:text-[var(--brand-green-bright)]">Request Quote</Link></li>
                 <li><Link href="/privacy" className="hover:text-[var(--brand-green-bright)]">Privacy Policy</Link></li>
                 <li><Link href="/divisions" className="hover:text-[var(--brand-green-bright)]">Divisions</Link></li>
-                <li><Link href="/login" className="hover:text-[var(--brand-green-bright)]">Staff Login</Link></li>
               </ul>
             </div>
 
