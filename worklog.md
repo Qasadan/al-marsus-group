@@ -281,3 +281,18 @@ Work Log:
 
 Stage Summary:
 - Website content now reflects the official company document end to end: the four businesses are MEP Engineering, Cold Chain Infrastructure & Solutions, Digital and Agro-Processing; Vision/Mission/Core Values/About/Founder message/Locations are live and admin-editable where fields exist (visionText, missionText, aboutText, divisionsJson). 73/73 tests, lint clean, prod build + smoke verified. Commits 475fb20 (+ db.ts resilience fix).
+
+---
+Task ID: 20.1 (ops)
+Agent: main
+Task: User report — preview panel stuck on the loading screen ("the preview is not working")
+
+Work Log:
+- Screenshot: preview tab eternally loading; Caddyfile confirms the preview gateway routes strictly to localhost:3000
+- Found port 3000 dead after the sandbox recycle; a stale production smoke server lingered on :3001 (cwd = deleted .next-prodcheck/standalone) — killed it; the platform-managed dev server did not come back after the recycle, and user-spawned processes are reaped at the end of every tool call (verified 3×, incl. setsid-detached)
+- Recovery within a single call: dev server restarted on :3000 — sweep /, /about, /divisions, /contact, /quote, /login, /api/health all 200; E2E suite 73 passed / 0 failed; agent-browser renders the homepage correctly (top banner, logo + wordmark, nav, hero "ONE GROUP · FOUR SPECIALISED DIVISIONS"); evidence download/preview/73-preview-restored.png
+- Persistence: one-time platform job scheduled (09:45 UTC+8) to re-check :3000, restart the dev server if down and notify the user — a platform-driven turn keeps the server alive across turns
+- No code changes; project files untouched
+
+Stage Summary:
+- Root cause: sandbox recycle left the preview's upstream (port 3000) without a server process; the app itself is fully healthy (all routes, 73/73 tests, browser render verified). Auto-restart scheduled; the preview recovers on reload.
