@@ -300,3 +300,22 @@ Stage Summary:
 Task 20.1 addendum — final root cause (user screenshot):
 - Preview edge returns {"error":"sandbox is inactive"} → the platform suspends the ENTIRE sandbox between chat messages by design ("sandbox is started on demand and can be recycled between messages; running processes are not kept"). This supersedes the port-3000 theory: during active turns the gateway routes fine (502 only when the app server itself is down); between turns the edge refuses with "sandbox is inactive" regardless of any server state. Every launched server "died" because the sandbox was suspended, not because of process reaping.
 - Conclusion: an always-open preview is not achievable inside this sandbox — the site is reachable while the session is active (during and shortly after each message/turn). Permanent 24/7 availability requires external deployment per docs/DEPLOYMENT.md (Vercel + Supabase/PostgreSQL). No project code changed ("fix it without changing something else" honored).
+
+---
+Task ID: 21
+Agent: main
+Task: User approved external deployment — prepare complete Vercel + Supabase deploy readiness ("let us do this")
+
+Work Log:
+- Audit: all raw SQL is portable ($queryRaw SELECT heroJson / UPDATE heroJson / SELECT 1); db.ts is provider-agnostic; auth needs only JWT_SECRET in prod; next.config images already allow all https hosts; schema has no SQLite-only types (verified 22 models)
+- prisma/schema.deploy.prisma (new): identical models, provider=postgresql — local schema.prisma stays SQLite untouched
+- src/app/api/uploads/route.ts: storage adapter — uses @vercel/blob (dynamic import) only when BLOB_READ_WRITE_TOKEN exists; local public/uploads path byte-identical otherwise (hero/gallery uploads keep working on serverless)
+- scripts/migrate-sqlite-to-postgres.ts (new): one-time full copy SQLite→Postgres via bun:sqlite read + PrismaClient(datasourceUrl) write; FK-ordered 24-table insert; Quotation.parentId/convertedProjectId circular refs filled in second pass; SQLite 0/1→boolean + datetime normalisation; per-table count verification, non-zero exit on mismatch; preserves ids incl. admin password hash (existing login keeps working)
+- DEPLOY-TO-VERCEL.md (new, root) + download/DEPLOY-STEPS.md: 8-step runbook (Supabase → local db push+migrate → GitHub → Vercel with build-command override `npx prisma generate --schema=prisma/schema.deploy.prisma && next build` → Vercel Blob → verification checklist → domain → troubleshooting incl. pooled-vs-direct URL and free-tier pause)
+- download/al-marsus-deploy-bundle.zip (2.3MB, 310 files): full project incl. db/custom.db (all data) + public/uploads (existing images ship as static assets) + all deploy assets; excludes node_modules/.next/.git/logs/.env
+- bun add @vercel/blob@2.8.2 (only dependency change)
+- Verification: esbuild syntax OK (route + script); lint clean; tsc exactly 31 errors (baseline — one bun:sqlite resolution error suppressed locally via @ts-ignore); live server 73/73 E2E assertions pass (uploads local path unchanged); zip contents verified (deploy schema, migration script, runbook, DB, images all present)
+- Commits e56d50b; no other files touched
+
+Stage Summary:
+- Project is now deploy-ready: user creates free Supabase/GitHub/Vercel accounts, runs 3 local commands (generate/db push/migrate), pushes to GitHub, imports to Vercel with one build-command override + 2 env vars, connects Blob for uploads. Same admin credentials, same data, same code paths. Local sandbox copy unchanged and still 73/73.
