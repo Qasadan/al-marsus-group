@@ -338,3 +338,23 @@ Work Log:
 
 Stage Summary:
 - Repo is fully assisted-deploy ready: when the user sends Supabase connection strings + Vercel token (+ optional GitHub PAT + chosen admin credentials), the deployment is: link project → set 3 env vars → deploy-db.sh (push+seed+import) → vercel deploy --prod → 73-test verification against the live URL. No local install needed by the user.
+
+---
+Task ID: 21-exec-1
+Agent: main
+Task: User sent Supabase credentials — provision production database (assistant-run deploy, step 1 of 2)
+
+Work Log:
+- Credentials stored in .env.deploy.local (gitignored via .env*); never committed
+- TCP probes: pooler host reachable on 6543 + 5432; legacy db.<ref>.supabase.co:5432 unreachable (IPv6-only for new projects) → session pooler (5432) adopted as DDL connection
+- Password format resolved empirically: bracket-wrapped variant failed as literal → stripped variant authenticates
+- prisma db push (schema.deploy.prisma, --skip-generate): all tables created in Supabase in ~32s — schema in sync
+- First deploy-db.sh run skipped content import: sandbox recycle had deleted gitignored content-snapshot.json between messages → regenerated via export-content.ts; root cause noted (untracked artifacts do not survive recycles; git-tracked files do)
+- import-content.ts: added read-back verification (companyName/hero images/divisions/visionText logged post-import; non-zero exit if settings row missing)
+- Content import to Supabase: ✓ 27 settings fields — read-back: companyName="Al-Marsus Group Ltd", hero images=3, divisions=4, visionText=469 chars
+- Runtime pooled URL (6543 + pgbouncer=true) auth-verified via prisma db execute SELECT 1
+- Local SQLite schema + client restored (deploy-db.sh trap); local dev unaffected
+- Admin user intentionally NOT seeded — awaiting user's real admin email/password choice
+
+Stage Summary:
+- Supabase production database is LIVE with full schema + real website content. Remaining: user sends Vercel access token (+ optional GitHub PAT, + admin email/password choice) → seed admin → vercel deploy → 73-test verification against the live URL.

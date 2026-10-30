@@ -106,6 +106,19 @@ async function main() {
       imported++;
     }
     console.log(`✓ Gallery items imported: ${imported}`);
+
+    // --- Read-back verification ------------------------------------------------
+    const verify = await db.companySettings.findUnique({ where: { id: "main" } });
+    if (verify) {
+      let heroImages = 0;
+      try {
+        heroImages = ((JSON.parse(verify.heroJson ?? "{}") as { images?: string[] }).images ?? []).length;
+      } catch { /* malformed heroJson — count 0 */ }
+      const divisions = (JSON.parse(verify.divisionsJson ?? "[]") as unknown[]).length;
+      console.log(`✓ Read-back: companyName="${verify.companyName}", hero images=${heroImages}, divisions=${divisions}, visionText=${(verify.visionText ?? "").length} chars`);
+    } else {
+      throw new Error("Read-back failed: CompanySettings id='main' not found after import.");
+    }
     console.log("Import complete. Users/credentials were not touched — seed creates the admin.");
   } finally {
     await db.$disconnect();
