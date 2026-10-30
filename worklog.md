@@ -296,3 +296,7 @@ Work Log:
 
 Stage Summary:
 - Root cause: sandbox recycle left the preview's upstream (port 3000) without a server process; the app itself is fully healthy (all routes, 73/73 tests, browser render verified). Auto-restart scheduled; the preview recovers on reload.
+
+Task 20.1 addendum — final root cause (user screenshot):
+- Preview edge returns {"error":"sandbox is inactive"} → the platform suspends the ENTIRE sandbox between chat messages by design ("sandbox is started on demand and can be recycled between messages; running processes are not kept"). This supersedes the port-3000 theory: during active turns the gateway routes fine (502 only when the app server itself is down); between turns the edge refuses with "sandbox is inactive" regardless of any server state. Every launched server "died" because the sandbox was suspended, not because of process reaping.
+- Conclusion: an always-open preview is not achievable inside this sandbox — the site is reachable while the session is active (during and shortly after each message/turn). Permanent 24/7 availability requires external deployment per docs/DEPLOYMENT.md (Vercel + Supabase/PostgreSQL). No project code changed ("fix it without changing something else" honored).
