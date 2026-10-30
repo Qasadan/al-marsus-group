@@ -4,6 +4,10 @@
  * Exercises the critical business workflows against real HTTP endpoints.
  */
 const BASE = process.env.TEST_BASE_URL ?? "http://localhost:3000";
+// Admin credentials default to the documented dev login; override via env to
+// run the suite against production (TEST_ADMIN_EMAIL / TEST_ADMIN_PASSWORD).
+const ADMIN_EMAIL = process.env.TEST_ADMIN_EMAIL ?? "admin@almarsus.dev";
+const ADMIN_PASSWORD = process.env.TEST_ADMIN_PASSWORD ?? "AlMarsus#2026";
 const RUN = Math.random().toString(36).slice(2, 8); // unique suffix per run (skus, emails)
 
 let cookie = "";
@@ -74,10 +78,10 @@ async function main() {
 
   console.log("\n=== 3. Authentication & authorization ===");
   {
-    const bad = await req("POST", "/api/auth/login", { email: "admin@almarsus.dev", password: "wrongpass" }, false);
+    const bad = await req("POST", "/api/auth/login", { email: ADMIN_EMAIL, password: "wrongpass" }, false);
     check("wrong password rejected (401)", bad.status === 401);
 
-    const good = await req("POST", "/api/auth/login", { email: "admin@almarsus.dev", password: "AlMarsus#2026" });
+    const good = await req("POST", "/api/auth/login", { email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
     check("super admin login works", envelopeOk(good) && (good.json as { data?: { role?: string } })?.data?.role === "SUPER_ADMIN");
 
     const me = await req("GET", "/api/auth/me");

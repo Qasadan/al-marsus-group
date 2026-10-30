@@ -319,3 +319,22 @@ Work Log:
 
 Stage Summary:
 - Project is now deploy-ready: user creates free Supabase/GitHub/Vercel accounts, runs 3 local commands (generate/db push/migrate), pushes to GitHub, imports to Vercel with one build-command override + 2 env vars, connects Blob for uploads. Same admin credentials, same data, same code paths. Local sandbox copy unchanged and still 73/73.
+
+---
+Task ID: 21-prep-2
+Agent: main
+Task: Consolidate + complete assisted-deployment tooling (user will send Supabase/Vercel/GitHub credentials for assistant-run deploy)
+
+Work Log:
+- Reconciled with prior prep (e56d50b): schemas functionally identical → removed duplicate prisma/schema.postgresql.prisma; standardised on committed prisma/schema.deploy.prisma; scripts updated to reference it
+- scripts/vercel-build.sh (new): Vercel build pipeline wired via vercel.json (buildCommand override) — swaps in deploy schema, prisma db push (DIRECT_DATABASE_URL preferred for DDL), generate, optional RUN_DB_SEED=1 one-time seed, optional IMPORT_CONTENT_FILE import, plain `next build` (package.json build's standalone cp steps are self-host-only; new build:next script)
+- scripts/export-content.ts + scripts/import-content.ts (new): website-copy snapshot (CompanySettings + GalleryItem) → JSON → upsert into target Postgres via TARGET_DATABASE_URL; refuses SQLite targets; never touches users/business data. Snapshot of current content exported: real company name, 3 hero images, 4 divisionsJson, full vision/mission/about
+- scripts/deploy-db.sh (new): one-shot sandbox provisioning — swap schema → push → seed (NODE_ENV=production guard respected) → import content → ALWAYS restores SQLite schema + client (trap EXIT)
+- scripts/api-tests.ts: admin credentials now env-overridable (TEST_ADMIN_EMAIL / TEST_ADMIN_PASSWORD; dev defaults unchanged) — enables the 73-assertion suite against the prod URL
+- .env.example (new): full production env var documentation incl. Supabase pooled-vs-direct notes; content-snapshot.json gitignored
+- docs/DEPLOYMENT.md §5 rewritten: Option A = CLI-assisted path (credentials checklist table for the operator, exact deployment sequence, Supabase pgbouncer notes, image-story, two migration paths); Option B = dashboard fallback; Option C = VPS (renumbered). DEPLOY-TO-VERCEL.md: pointer added — DIY runbook now secondary to assisted path
+- Verified: bash -n both shell scripts OK; prisma validate on deploy schema with postgres URL = valid; export/import guards tested; snapshot regenerated with real content
+- Note: existing public/uploads images (14 files, incl. 3 hero slides) are committed to git → deploy as static assets, /uploads/... URLs stay valid on Vercel; new prod uploads auto-route to Vercel Blob when BLOB_READ_WRITE_TOKEN present (built in e56d50b)
+
+Stage Summary:
+- Repo is fully assisted-deploy ready: when the user sends Supabase connection strings + Vercel token (+ optional GitHub PAT + chosen admin credentials), the deployment is: link project → set 3 env vars → deploy-db.sh (push+seed+import) → vercel deploy --prod → 73-test verification against the live URL. No local install needed by the user.

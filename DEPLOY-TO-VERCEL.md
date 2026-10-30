@@ -1,5 +1,13 @@
 # 🚀 Deploy Al-Marsus to Vercel + Supabase (24/7, free)
 
+> **Two ways to deploy — pick one:**
+> - **Assisted (new, fastest):** you create the free accounts and send the assistant the
+>   tokens/connection strings listed in `docs/DEPLOYMENT.md` §5 Option A — it runs the
+>   whole deployment from the sandbox (`scripts/vercel-build.sh`, `scripts/deploy-db.sh`)
+>   and verifies with the 73-assertion suite. No local install needed on your computer.
+> - **DIY (this runbook):** you do every step yourself on your own computer from
+>   `al-marsus-deploy-bundle.zip`. Same result.
+
 Follow these steps **in order**. Total time: ~45–60 minutes. Everything below uses **free tiers**.
 Your local sandbox copy stays exactly as it is — the deploy schema (`prisma/schema.deploy.prisma`) is separate from the local one.
 

@@ -52,3 +52,6 @@ prompt
 server.log
 # Skills directory
 /skills/db/.jwt-secret
+
+# deployment content snapshots (contain public website copy, not needed in git)
+content-snapshot.json

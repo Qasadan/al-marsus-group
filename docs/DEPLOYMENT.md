@@ -67,14 +67,93 @@ Then:
 
 ## 5. Frontend + API deployment
 
-### Option A — Vercel
-1. Push the repository to GitHub.
-2. Import the repo in Vercel → framework auto-detects Next.js.
-3. Add all env vars from §3 in Project → Settings → Environment Variables.
-4. Deploy. `next build` runs automatically.
+### Option A — Vercel (CLI-assisted — the path used for this project)
+
+The repo ships full deployment tooling: `scripts/vercel-build.sh` (Vercel build
+pipeline: swaps in the PostgreSQL schema, pushes it, seeds/imports content,
+then runs `next build`), `scripts/deploy-db.sh` (one-shot DB provisioning from
+the sandbox), and `scripts/export-content.ts` / `scripts/import-content.ts`
+(website-copy migration). `vercel.json` wires the build command.
+
+**What the operator must provide** (free-tier accounts, no credit card):
+
+| # | Item | Where to get it | Used for |
+|---|------|-----------------|----------|
+| 1 | Supabase **pooled** connection string | Supabase → Settings → Database → Connection string → *Transaction pooler* URI, with `[YOUR-PASSWORD]` replaced by the DB password you set when creating the project | `DATABASE_URL` (app runtime) |
+| 2 | Supabase **direct** connection string | Same page → *Direct connection* URI (port 5432), password filled in | `DIRECT_DATABASE_URL` (schema push) |
+| 3 | Vercel **access token** | vercel.com → Account Settings → Tokens → Create (scope: Full Account, expiry ~1 day) | CLI deploy: project creation, env vars, `deploy --prod` |
+| 4 | GitHub **personal access token** (classic, `repo` scope) — optional but recommended | github.com → Settings → Developer settings → PAT | Push repo → enables auto-deploy on every push |
+| 5 | Real **admin email + strong password** (min 8 chars) | Your choice — this becomes the first SUPER_ADMIN login | Seed + first login; change password after |
+
+> Security: tokens live only in the deployment session (CLI env), never in the
+> repo or in `.env` files that get committed. Revoke/rotate them after setup.
+
+**Deployment sequence** (executed by the assistant once credentials arrive):
+
+```bash
+# 0. (optional) GitHub: create private repo + push
+git remote add origin https://<TOKEN>@github.com/<user>/al-marsus-group.git
+git push -u origin main
+
+# 1. Vercel: link project + create Blob store for future uploads
+npx vercel link --yes --project al-marsus-group --token <TOKEN>
+#    (connect a Blob store in dashboard → Storage, or via `vercel blob`)
+
+# 2. Environment variables
+npx vercel env add DATABASE_URL production --token <TOKEN>          # pooled URL
+npx vercel env add DIRECT_DATABASE_URL production --token <TOKEN>   # direct URL
+npx vercel env add JWT_SECRET production --token <TOKEN>            # openssl rand -base64 32
+
+# 3. Provision DB from the sandbox (push + seed + import content)
+bash scripts/export-content.ts                                # snapshot website copy
+TARGET_DATABASE_URL=... DIRECT_DATABASE_URL=... ADMIN_EMAIL=... ADMIN_PASSWORD=... \
+  CONTENT_FILE=content-snapshot.json bash scripts/deploy-db.sh
+
+# 4. First deploy (one-time seed flag)
+npx vercel deploy --prod --token <TOKEN>
+#    (or set RUN_DB_SEED=1 + ADMIN_* env vars for the first build if the
+#     sandbox cannot reach Supabase directly, then remove them)
+
+# 5. Verify against the live URL
+TEST_BASE_URL=https://<app>.vercel.app TEST_ADMIN_EMAIL=... TEST_ADMIN_PASSWORD=... \
+  bun scripts/api-tests.ts
+```
+
+**Supabase connection notes:**
+- Runtime `DATABASE_URL` must be the **pooled** (transaction, port 6543) URL
+  and include `?pgbouncer=true` — serverless functions need PgBouncer; Prisma
+  requires the flag to disable prepared statements.
+- Schema push (`prisma db push`) prefers `DIRECT_DATABASE_URL` (port 5432).
+- Sandbox → Supabase reachability is verified during step 3; if blocked, the
+  Vercel build itself performs push + seed (steps 3–4 merge into one deploy).
+
+**Existing hero/gallery images:** all files under `public/uploads/` are
+committed to git and deploy as static assets, so their `/uploads/...` URLs in
+the settings keep working unchanged. New uploads made in production go to
+**Vercel Blob** automatically (`BLOB_READ_WRITE_TOKEN` detected at runtime —
+see `src/app/api/uploads/route.ts`).
+
+**Two data-migration paths — pick one:**
+- **Content-only (recommended for launch):** `scripts/deploy-db.sh` provisions
+  an empty production DB, seeds the real admin from env vars, and imports the
+  website copy snapshot (`scripts/export-content.ts` → CompanySettings +
+  gallery). Customers/products/test data stay behind — clean start.
+- **Full data copy:** `scripts/migrate-sqlite-to-postgres.ts` clones every
+  table from `db/custom.db` (ids, dates, admin password hash preserved —
+  existing logins keep working). Use if existing quotations/customers must
+  survive the move. See `DEPLOY-TO-VERCEL.md` for the DIY variant of this path.
+
+### Option B — Vercel (dashboard-only fallback)
+
+1. Push the repository to GitHub (or use `vercel deploy` without Git).
+2. Import the repo in Vercel → framework auto-detects Next.js; `vercel.json`
+   already points the build at `scripts/vercel-build.sh`.
+3. Add all env vars from §3 in Project → Settings → Environment Variables
+   (`DATABASE_URL`, `DIRECT_DATABASE_URL`, `JWT_SECRET`).
+4. Deploy. The build pushes the schema to Supabase automatically.
 5. Attach your domain (Project → Domains) — HTTPS certificates are automatic.
 
-### Option B — VPS (Node)
+### Option C — VPS (Node)
 ```bash
 git clone <your-repo> && cd <repo>
 bun install                       # or npm ci
