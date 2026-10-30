@@ -259,3 +259,25 @@ Work Log:
 
 Stage Summary:
 - Staff login is no longer publicly visible or indexable: footer link removed, /login noindexed, direct-URL access preserved for staff. Zero functional changes; 73/73 tests, lint clean. Committed bdc1ee1.
+
+---
+Task ID: 20
+Agent: main
+Task: User request — apply the official company document ("Our Vision and mission.docx") to the website content without breaking the project
+
+Work Log:
+- Document analysis: defines the four businesses as MEP Engineering / Cold Chain Infrastructure & Solutions / Digital / AGRO-PROCESSING (Agro replaces Operations Services; Cold Chain renamed) + Vision, Mission, 6 Core Values, About/"Who are we", The Strength of Our Group, Founder's message, Contact (HQ Mogadishu; branches Baidoa & Barawe; phone +252617939598/+252627939598; email almarsus.ltd@gmail.com)
+- src/lib/divisions.ts rewritten: DIVISION_CODES now [MEP_ENGINEERING, COLD_CHAIN, DIGITAL, AGRO_PROCESSING] (doc order); new slugs/taglines/descriptions/services from the document (6 per division, 24 total); icon union "hard-hat"→"wheat" (lucide Wheat); solar kept as an MEP service (user-established focus; doc list is non-exhaustive)
+- Icon maps updated in 6 files (site-header, page, about, services, divisions, divisions/[slug])
+- layout.tsx metadata (title/OG/keywords) aligned to the new four businesses
+- About page: added Core Values grid (6), "The Strength of Our Group" card, "A Message from Our Founder" dark quote band — all verbatim document content
+- Contact page: PageHero → "Let's Build Opportunities Together." + enquiry-audience copy; new Our Locations card (Head Office Mogadishu, Branches Baidoa & Barawe) + Business enquiries line
+- scripts/apply-doc-content.ts (one-off, kept as record): migrated division code rows OPERATIONS_SERVICES→AGRO_PROCESSING across Lead/QuoteRequest/Quotation/Project/GalleryItem (0 rows existed); rewrote CompanySettings — tagline, heroTitle/heroSubtitle (doc "who we are"), aboutText (6 doc paragraphs), missionText, visionText (doc verbatim), address "Mogadishu, Somalia", divisionsJson (4 doc-based overrides)
+- seed.ts defaults aligned to the new four businesses
+- INCIDENT + FIX: after the content migration, all server-side DB writes 500'd ("attempt to write a readonly database") — the long-running dev server's PrismaClient had opened its SQLite connection during a transient read-only window and cached it (fresh processes wrote fine). Restarting the platform-managed dev server was too risky; instead src/lib/db.ts now disconnects + clears any stale globalThis-cached client on module re-evaluation, so dev HMR rebuilds a fresh PrismaClient with current file permissions. Writes recovered immediately; fix kept as permanent resilience (prod: module evaluates once, no-op)
+- Verification: lint clean; tsc 31 errors before AND after (zero new); 73/73 E2E suite passes on the new division enum; browser — homepage h1 "Engineering, Cold Chain, Digital & Agro-Processing — Delivered by One Group", 4 division cards with doc taglines + wheat icon, /divisions/agro-processing renders, old /divisions/operations-services 404s (no internal links), About shows Who-we-are/Mission/Vision/Core Values/Strength/Founder, Contact shows locations+enquiries; isolated prod build compiled + standalone smoke on :3001 — all 13 routes 200 with new content markers; tsconfig auto-edit reverted
+- Note: harness file churn observed (mode flips on login/layout.tsx, binary mtime/content touches on 3 upload JPGs + a screenshot) — left uncommitted; unrelated to app code
+- Evidence: download/preview/67-72
+
+Stage Summary:
+- Website content now reflects the official company document end to end: the four businesses are MEP Engineering, Cold Chain Infrastructure & Solutions, Digital and Agro-Processing; Vision/Mission/Core Values/About/Founder message/Locations are live and admin-editable where fields exist (visionText, missionText, aboutText, divisionsJson). 73/73 tests, lint clean, prod build + smoke verified. Commits 475fb20 (+ db.ts resilience fix).
