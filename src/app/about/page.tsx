@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Zap, Cpu, HardHat, Snowflake } from "lucide-react";
+import { ArrowRight, Zap, Cpu, Wheat, Snowflake } from "lucide-react";
 import { PublicShell } from "@/components/public/public-shell";
 import { PageHero } from "@/components/public/page-hero";
 import { getPublicSettings } from "@/lib/settings";
@@ -9,10 +9,10 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "Learn about Al-Marsus Group Ltd — a multi-division engineering and services group: MEP engineering, digital, operations services and cold chain logistics.",
+    "Learn about Al-Marsus Group Ltd — a diversified group establishing sustainable businesses across engineering, cold-chain infrastructure, digital innovation and agro-processing.",
 };
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export default async function AboutPage() {
   const s = await getPublicSettings();
@@ -86,6 +86,79 @@ export default async function AboutPage() {
             </p>
           </div>
         </div>
+
+        {/* Core values — official company document */}
+        <div>
+          <h2 className="text-2xl font-bold mb-3">Our Core Values</h2>
+          <p className="text-sm text-muted-foreground mb-6 max-w-2xl">
+            The principles that guide how we build and run every business in the group.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: "Integrity",
+                text: "Conducting business with honesty, transparency, and accountability.",
+              },
+              {
+                title: "Excellence",
+                text: "Striving for high standards in service delivery and business performance.",
+              },
+              {
+                title: "Innovation",
+                text: "Embracing modern technology and practical solutions to meet changing needs.",
+              },
+              {
+                title: "Commitment",
+                text: "Building trust through responsibility, professionalism, and dedication.",
+              },
+              {
+                title: "Sustainability",
+                text: "Pursuing responsible business practices and long-term value creation.",
+              },
+              {
+                title: "Collaboration",
+                text: "Developing meaningful partnerships and encouraging cooperation across our businesses.",
+              },
+            ].map((v) => (
+              <div key={v.title} className="glow-soft rounded-xl border border-border bg-card p-5">
+                <h3 className="font-semibold text-[var(--brand-green)] dark:text-[var(--brand-green-bright)]">{v.title}</h3>
+                <p className="mt-1.5 text-sm text-muted-foreground">{v.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* The strength of our group — integrated approach from the company document */}
+        <div className="glow-soft rounded-xl border border-border bg-card p-6">
+          <h2 className="text-2xl font-bold mb-3">The Strength of Our Group</h2>
+          <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+            <p>
+              Our subsidiaries have the potential to work together to deliver coordinated solutions. Engineering can
+              support suitable technical infrastructure. Cold-chain services can help preserve agricultural products.
+              Digital systems can improve operational management, while agro-processing can turn agricultural
+              resources into market-ready products.
+            </p>
+            <p>
+              Through this integrated approach, {s.companyName} aims to develop complementary businesses that create
+              value across multiple sectors.
+            </p>
+          </div>
+        </div>
+
+        {/* A message from our founder — official company document */}
+        <figure className="relative overflow-hidden rounded-xl bg-[var(--brand-footer)] p-8 text-white">
+          <div className="bg-dots-dark absolute inset-0 opacity-40" aria-hidden="true" />
+          <div className="relative">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--brand-green-bright)]">
+              A Message from Our Founder
+            </p>
+            <blockquote className="mt-4 text-lg font-medium leading-relaxed">
+              “We believe that great businesses are built not only to create value, but also to create opportunities,
+              solve real challenges, and contribute to a better future.”
+            </blockquote>
+            <figcaption className="mt-4 text-sm text-white/70">— Founder, {s.companyName}</figcaption>
+          </div>
+        </figure>
         <div className="rounded-xl bg-muted p-6 text-sm text-muted-foreground">
           <strong className="text-foreground">Note:</strong> Company history, certifications, team details and
           testimonials are intentionally left as configurable placeholders — they are published only after the company

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, ArrowLeft, Zap, Cpu, HardHat, Snowflake, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowLeft, Zap, Cpu, Wheat, Snowflake, CheckCircle2 } from "lucide-react";
 import { PublicShell } from "@/components/public/public-shell";
 import { getPublicSettings } from "@/lib/settings";
 import { getDivisionBySlug, DIVISION_LIST } from "@/lib/divisions";
@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export async function generateStaticParams() {
   return DIVISION_LIST.map((d) => ({ slug: d.slug }));

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Zap, Cpu, HardHat, Snowflake } from "lucide-react";
+import { ArrowRight, Zap, Cpu, Wheat, Snowflake } from "lucide-react";
 import { PublicShell } from "@/components/public/public-shell";
 import { PageHero } from "@/components/public/page-hero";
 import { getPublicSettings } from "@/lib/settings";
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     "Al-Marsus Group Ltd operates four specialised divisions: MEP Engineering, Digital, Operations Services and Cold Chain Storage & Logistics.",
 };
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export default async function DivisionsPage() {
   const settings = await getPublicSettings();

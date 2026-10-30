@@ -4,7 +4,7 @@ import {
   ArrowRight,
   Zap,
   Cpu,
-  HardHat,
+  Wheat,
   Snowflake,
   Phone,
   ShieldCheck,
@@ -23,7 +23,7 @@ import { divisionLabel } from "@/lib/divisions";
 
 export const dynamic = "force-dynamic";
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export default async function HomePage() {
   const settings = await getPublicSettings();
@@ -35,10 +35,10 @@ export default async function HomePage() {
   const divisions = settings.divisions;
   // No-code hero content — every value is admin-editable (Admin → Settings → Homepage hero).
   const hero = settings.hero;
-  const heroTitle = settings.heroTitle ?? "Engineering, Digital, Operations & Cold Chain — Delivered by One Group";
+  const heroTitle = settings.heroTitle ?? "Engineering, Cold Chain, Digital & Agro-Processing — Delivered by One Group";
   const heroSubtitle =
     settings.heroSubtitle ??
-    "Al-Marsus Group Ltd serves homes and businesses through four specialised branches: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics.";
+    "Al-Marsus Group Ltd is a diversified parent company establishing sustainable businesses across engineering, cold-chain infrastructure & solutions, digital innovation, and agro-processing.";
   const heroBadge = hero.badge ?? "One Group · Four Specialised Divisions";
   const primaryCta = { label: hero.primaryCtaLabel ?? "Request a Free Quote", href: hero.primaryCtaHref ?? "/quote" };
   const secondaryCta = { label: hero.secondaryCtaLabel ?? "Explore Our Divisions", href: hero.secondaryCtaHref ?? "/divisions" };

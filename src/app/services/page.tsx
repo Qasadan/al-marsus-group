@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PublicShell } from "@/components/public/public-shell";
 import { PageHero } from "@/components/public/page-hero";
 import { getPublicSettings } from "@/lib/settings";
-import { Zap, Cpu, HardHat, Snowflake, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Zap, Cpu, Wheat, Snowflake, ArrowRight, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Services across all four Al-Marsus Group divisions: MEP engineering & solar, digital solutions, operations services, and cold chain storage & logistics.",
 };
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export default async function ServicesPage() {
   const s = await getPublicSettings();

@@ -27,13 +27,13 @@ async function main() {
     create: {
       id: "main",
       companyName: "Al-Marsus Group Ltd",
-      tagline: "Engineering · Digital · Operations · Cold Chain",
+      tagline: "Engineering · Cold Chain · Digital · Agro-Processing",
       // PLACEHOLDER website copy — configure in Admin → Settings before launch.
-      heroTitle: "Engineering, Digital, Operations & Cold Chain — Delivered by One Group",
+      heroTitle: "Engineering, Cold Chain, Digital & Agro-Processing — Delivered by One Group",
       heroSubtitle:
-        "Al-Marsus Group Ltd serves homes and businesses through four specialised divisions: MEP engineering (including solar energy), digital solutions, operations services, and cold chain storage & logistics. Configure this text in Admin → Settings.",
+        "Al-Marsus Group Ltd is a diversified parent company establishing sustainable businesses across engineering, cold-chain infrastructure & solutions, digital innovation, and agro-processing. Configure this text in Admin → Settings.",
       aboutText:
-        "Al-Marsus Group Ltd is a multi-division engineering and services group operating through four specialised branches: Al-Marsus MEP Engineering, Al-Marsus Digital, Al-Marsus Operations Services, and Al-Marsus Cold Chain Storage & Logistics. [Placeholder — replace with the company's real history, mission and certifications in Admin → Settings.]",
+        "Al-Marsus Group Ltd is a diversified parent company operating through four specialised businesses: Al-Marsus MEP Engineering, Al-Marsus Cold Chain Infrastructure & Solutions, Al-Marsus Digital, and Al-Marsus Agro-Processing. [Placeholder — replace with the company's real history, mission and certifications in Admin → Settings.]",
       missionText: "[Placeholder — configure in Settings]",
       visionText: "[Placeholder — configure in Settings]",
       // Division service catalogues are seeded as built-in defaults and editable

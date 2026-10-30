@@ -8,7 +8,8 @@ import type { Metadata } from "next";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: "Contact Al-Marsus Group Ltd for quotations, support and general enquiries across all four divisions.",
+  description:
+    "Contact Al-Marsus Group Ltd — general enquiries, partnerships, investment opportunities and subsidiary-specific services across all four businesses.",
 };
 
 export default async function ContactPage() {
@@ -31,8 +32,8 @@ export default async function ContactPage() {
     <PublicShell>
       <PageHero
         eyebrow="Contact"
-        title="Contact Us"
-        description="Reach out for quotations, support or general questions. We respond during business hours."
+        title="Let's Build Opportunities Together."
+        description="We welcome enquiries from customers, investors, suppliers, institutions, and potential business partners interested in our vision and future business opportunities."
       />
 
       <section className="mx-auto max-w-7xl px-4 sm:px-6 py-14 grid gap-10 lg:grid-cols-5">
@@ -61,6 +62,26 @@ export default async function ContactPage() {
               Admin → Settings.
             </div>
           )}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-start gap-4">
+              <div className="rounded-lg bg-secondary p-2.5 text-primary">
+                <MapPin className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Our Locations</p>
+                <p className="mt-1 font-medium">
+                  Head Office — Mogadishu, Somalia
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Branches — Baidoa, Somalia · Barawe, Somalia
+                </p>
+              </div>
+            </div>
+            <p className="mt-4 border-t border-border pt-3 text-sm text-muted-foreground">
+              <span className="font-medium text-foreground">Business enquiries:</span> general enquiries, partnerships,
+              investment opportunities, and subsidiary-specific services.
+            </p>
+          </div>
           <div className="flex items-start gap-4 rounded-xl border border-border bg-card p-5">
             <div className="rounded-lg bg-secondary p-2.5 text-primary">
               <Clock className="h-5 w-5" />

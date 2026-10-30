@@ -1,10 +1,11 @@
 // Al-Marsus Group Ltd — division (business branch) definitions.
 //
-// The group operates FOUR branches:
+// The group operates FOUR specialised businesses (per the official company
+// document "Our Vision and mission"):
 //   1. Al-Marsus MEP Engineering
-//   2. Al-Marsus Digital
-//   3. Al-Marsus Operations Services
-//   4. Al-Marsus Cold Chain Storage & Logistics
+//   2. Al-Marsus Cold Chain Infrastructure & Solutions
+//   3. Al-Marsus Digital
+//   4. Al-Marsus Agro-Processing
 //
 // This file is the built-in default content. Administrators can override the
 // tagline, description and service lists per division via Admin → Settings
@@ -14,7 +15,7 @@
 // claim that requires verification (certifications, accreditations, client
 // names) is intentionally NOT included here.
 
-export const DIVISION_CODES = ["MEP_ENGINEERING", "DIGITAL", "OPERATIONS_SERVICES", "COLD_CHAIN"] as const;
+export const DIVISION_CODES = ["MEP_ENGINEERING", "COLD_CHAIN", "DIGITAL", "AGRO_PROCESSING"] as const;
 export type DivisionCode = (typeof DIVISION_CODES)[number];
 
 export interface DivisionService {
@@ -27,7 +28,7 @@ export interface DivisionDefinition {
   slug: string;
   shortName: string;
   fullName: string;
-  icon: "zap" | "cpu" | "hard-hat" | "snowflake";
+  icon: "zap" | "cpu" | "snowflake" | "wheat";
   defaultTagline: string;
   defaultDescription: string;
   defaultServices: DivisionService[];
@@ -40,40 +41,81 @@ export const DIVISIONS: Record<DivisionCode, DivisionDefinition> = {
     shortName: "MEP Engineering",
     fullName: "Al-Marsus MEP Engineering",
     icon: "zap",
-    defaultTagline:
-      "Mechanical, electrical and plumbing engineering — with solar energy as our flagship offering.",
+    defaultTagline: "Engineering Reliable Infrastructure",
     defaultDescription:
-      "The engineering backbone of the group. Al-Marsus MEP Engineering designs, supplies, installs and commissions mechanical, electrical and plumbing systems for residential, commercial and industrial buildings — including solar PV and energy storage systems delivered end to end, from site survey to long-term maintenance.",
+      "Al-Marsus MEP Engineering focuses on mechanical, electrical, and plumbing engineering services for buildings, commercial facilities, and infrastructure projects. Our objective is to support reliable, efficient, and functional facilities through professional engineering practices and quality-focused solutions.",
     defaultServices: [
+      {
+        title: "Electrical Installations",
+        description:
+          "Power distribution, lighting, backup and UPS systems, earthing and lightning protection — installed to code, tested and commissioned before handover.",
+      },
+      {
+        title: "Plumbing & Drainage Systems",
+        description:
+          "Water supply, pumping, storage and drainage systems designed for pressure, hygiene and durability in residential, commercial and public buildings.",
+      },
+      {
+        title: "HVAC & Refrigeration Systems",
+        description:
+          "Air conditioning, ventilation, climate control and refrigeration systems for buildings and cold rooms, sized and balanced by qualified engineers.",
+      },
       {
         title: "Solar Energy Solutions",
         description:
           "Grid-tied, hybrid and off-grid solar PV systems with battery storage — site surveys, system design, installation, commissioning and long-term maintenance.",
       },
       {
-        title: "Electrical Systems",
+        title: "Engineering Support & Installation",
         description:
-          "Power distribution, lighting, backup and UPS systems, earthing and lightning protection — installed to code and tested before handover.",
-      },
-      {
-        title: "Mechanical & HVAC",
-        description:
-          "Air conditioning, ventilation and climate-control systems for buildings and cold rooms, sized and balanced by qualified engineers.",
-      },
-      {
-        title: "Plumbing & Water Systems",
-        description:
-          "Water supply, pumping, storage and drainage systems designed for pressure, hygiene and durability.",
-      },
-      {
-        title: "Fire Protection Systems",
-        description:
-          "Fire detection, alarm and suppression pipework integrated with the rest of the building services.",
+          "Technical supervision, installation management and commissioning support for developers, contractors and facility owners.",
       },
       {
         title: "Maintenance & Retrofit",
         description:
           "Preventive maintenance contracts, fault troubleshooting and energy-efficiency upgrades for existing MEP installations.",
+      },
+    ],
+  },
+  COLD_CHAIN: {
+    code: "COLD_CHAIN",
+    slug: "cold-chain",
+    shortName: "Cold Chain",
+    fullName: "Al-Marsus Cold Chain Infrastructure & Solutions",
+    icon: "snowflake",
+    defaultTagline: "Preserving Quality. Connecting Markets.",
+    defaultDescription:
+      "Al-Marsus Cold Chain Infrastructure & Solutions focuses on cold storage infrastructure and temperature-controlled services for farmers, exporters, food businesses, and other customers handling perishable products. Our ambition is to help preserve product quality, reduce avoidable post-harvest losses, and strengthen connections between producers and markets.",
+    defaultServices: [
+      {
+        title: "Cold Storage Facilities",
+        description:
+          "Walk-in chillers and freezers designed, built and operated around your product's temperature profile, with chilled and frozen storage capacity.",
+      },
+      {
+        title: "Refrigerated Fleet & Distribution",
+        description:
+          "Temperature-controlled collection and delivery with planned routes, monitoring and delivery documentation from farm or facility to market.",
+      },
+      {
+        title: "Farmer Collection Centres",
+        description:
+          "Local collection points where producers can bring perishable produce for immediate cooling, safe storage and onward distribution.",
+      },
+      {
+        title: "Pre-Cooling Facilities",
+        description:
+          "Rapid pre-cooling that removes field heat from freshly harvested produce — a critical step for preserving shelf life and quality.",
+      },
+      {
+        title: "Export Cold-Chain Hubs",
+        description:
+          "Consolidation, storage and handling hubs that prepare temperature-sensitive goods for export markets under controlled conditions.",
+      },
+      {
+        title: "Temperature Monitoring & Compliance",
+        description:
+          "Continuous temperature logging, alarm escalation and reports supporting food-safety and quality requirements across the chain.",
       },
     ],
   },
@@ -83,30 +125,24 @@ export const DIVISIONS: Record<DivisionCode, DivisionDefinition> = {
     shortName: "Digital",
     fullName: "Al-Marsus Digital",
     icon: "cpu",
-    defaultTagline:
-      "Digital products, connectivity and smart technology for modern businesses.",
+    defaultTagline: "Digital Engineering. Smarter Maintenance.",
     defaultDescription:
-      "Al-Marsus Digital builds the technology layer of the group — from company websites and business management software to the networks, security systems and smart devices that keep sites connected, monitored and secure.",
+      "Al-Marsus Digital delivers digital MEP design, BIM modelling, engineering software solutions, and QR-code-based maintenance management for buildings and engineering facilities. Our goal is to connect engineering with digital innovation for smarter, safer, and more efficient building management.",
     defaultServices: [
       {
-        title: "Websites & Web Applications",
+        title: "Digital MEP Design & BIM Modelling",
         description:
-          "Company websites, customer portals and online booking or ordering systems — designed, built and maintained by the team.",
+          "Building Information Modelling and coordinated digital MEP design that reduces clashes, rework and cost before construction begins.",
       },
       {
-        title: "Business Management Software",
+        title: "Engineering Software Solutions",
         description:
-          "Quotation, inventory, invoicing and workflow tools tailored to how your business actually operates.",
+          "Business management software — quotations, inventory, invoicing and workflow tools — tailored to how your operation actually runs.",
       },
       {
-        title: "Networking & IT Infrastructure",
+        title: "QR-Code Maintenance Management",
         description:
-          "Structured cabling, LAN and Wi-Fi, servers and cloud setup for offices, sites and warehouses.",
-      },
-      {
-        title: "CCTV & Access Control",
-        description:
-          "Surveillance cameras, access control and alarm systems with remote monitoring and recording.",
+          "QR-coded equipment that lets clients access equipment records, track maintenance dates, schedule servicing and manage engineering assets efficiently.",
       },
       {
         title: "Smart Building & Monitoring",
@@ -114,85 +150,56 @@ export const DIVISIONS: Record<DivisionCode, DivisionDefinition> = {
           "Sensors and dashboards for energy, temperature and equipment monitoring across one or many sites.",
       },
       {
-        title: "IT Support & Managed Services",
+        title: "Websites & Business Applications",
         description:
-          "Helpdesk support, device and account management, backups and ongoing system care.",
+          "Company websites, customer portals and online booking or ordering systems — designed, built and maintained by the team.",
+      },
+      {
+        title: "Networking & Security Systems",
+        description:
+          "Structured cabling, LAN and Wi-Fi, servers, CCTV and access control with remote monitoring and recording.",
       },
     ],
   },
-  OPERATIONS_SERVICES: {
-    code: "OPERATIONS_SERVICES",
-    slug: "operations-services",
-    shortName: "Operations Services",
-    fullName: "Al-Marsus Operations Services",
-    icon: "hard-hat",
-    defaultTagline:
-      "Operations, maintenance and skilled manpower that keep facilities running.",
+  AGRO_PROCESSING: {
+    code: "AGRO_PROCESSING",
+    slug: "agro-processing",
+    shortName: "Agro-Processing",
+    fullName: "Al-Marsus Agro-Processing",
+    icon: "wheat",
+    defaultTagline: "Turning Agricultural Resources into Greater Value",
     defaultDescription:
-      "Al-Marsus Operations Services takes responsibility for the day-to-day running of buildings and equipment — planned preventive maintenance, repairs, operations support and qualified technicians on the ground, all coordinated and supervised by the group.",
+      "Al-Marsus Agro-Processing focuses on agricultural processing and value addition, with an emphasis on improving product quality, preservation, packaging, and market readiness. Our ambition is to support agricultural producers, strengthen local value chains, reduce post-harvest losses, and create opportunities for agricultural products to reach wider markets.",
     defaultServices: [
       {
-        title: "Facility Management",
+        title: "Produce Handling & Reception",
         description:
-          "Planned preventive maintenance schedules and day-to-day repairs for commercial and residential properties.",
+          "Careful reception and handling of agricultural produce at the point of intake to protect quality from the very first step.",
       },
       {
-        title: "Technical Manpower",
+        title: "Cleaning, Sorting & Grading",
         description:
-          "Skilled technicians, machine operators and maintenance crews supplied, scheduled and supervised by the group.",
+          "Cleaning, sorting and grading lines that prepare produce to consistent quality standards buyers can rely on.",
       },
       {
-        title: "Generator & Plant Operation",
+        title: "Processing & Preservation",
         description:
-          "Standby generator servicing, fuel management and plant-room operation with run-hour logs and reports.",
+          "Processing and preservation methods that extend shelf life and open the door to new product formats.",
       },
       {
-        title: "Equipment Servicing",
+        title: "Packaging & Market Readiness",
         description:
-          "Pumps, HVAC units, distribution boards and cold-room equipment serviced on a fixed schedule.",
+          "Packaging solutions that protect the product, communicate quality and prepare goods for retail and export markets.",
       },
       {
-        title: "Operations Support & Reporting",
+        title: "Value-Added Product Development",
         description:
-          "Site supervision, checklists, service logs and monthly reporting that keep operations auditable.",
-      },
-    ],
-  },
-  COLD_CHAIN: {
-    code: "COLD_CHAIN",
-    slug: "cold-chain",
-    shortName: "Cold Chain",
-    fullName: "Al-Marsus Cold Chain Storage & Logistics",
-    icon: "snowflake",
-    defaultTagline:
-      "Cold storage and temperature-controlled logistics you can rely on.",
-    defaultDescription:
-      "Al-Marsus Cold Chain provides temperature-controlled storage and distribution for food, agricultural and pharmaceutical goods — from cold-room design and construction to refrigerated transport, monitoring and compliance reporting.",
-    defaultServices: [
-      {
-        title: "Cold Room Design & Construction",
-        description:
-          "Walk-in chillers and freezers designed, built and commissioned around your product's temperature profile.",
+          "Development of value-added products that turn raw agricultural resources into higher-value offerings.",
       },
       {
-        title: "Cold Storage Warehousing",
+        title: "Post-Harvest Loss Reduction",
         description:
-          "Chilled and frozen pallet storage with inventory tracking, stock rotation and loading support.",
-      },
-      {
-        title: "Refrigerated Transport & Distribution",
-        description:
-          "Temperature-controlled collection and delivery with planned routes and delivery documentation.",
-      },
-      {
-        title: "Temperature Monitoring & Compliance",
-        description:
-          "Continuous temperature logging, alarm escalation and reports supporting food-safety and GDP requirements.",
-      },
-      {
-        title: "Refrigeration Equipment & Service",
-        description:
-          "Refrigeration units, spare parts and preventive maintenance contracts for cold rooms and display equipment.",
+          "Practical support for producers on handling, storage and market linkage — reducing avoidable post-harvest losses.",
       },
     ],
   },

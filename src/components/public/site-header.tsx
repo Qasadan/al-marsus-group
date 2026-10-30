@@ -10,7 +10,7 @@ import {
   ChevronDown,
   Zap,
   Cpu,
-  HardHat,
+  Wheat,
   Snowflake,
   LayoutGrid,
   Phone,
@@ -38,7 +38,7 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "hard-hat": HardHat, snowflake: Snowflake } as const;
+const DIVISION_ICONS = { zap: Zap, cpu: Cpu, "wheat": Wheat, snowflake: Snowflake } as const;
 
 export function SiteHeader({
   companyName = "Al-Marsus Group Ltd",
