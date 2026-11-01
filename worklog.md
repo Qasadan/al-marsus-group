@@ -389,3 +389,19 @@ Work Log:
 
 Stage Summary:
 - All three production env vars now hold verified real values. Awaiting git-triggered production build; on READY → live-site verification (routes + health + content).
+
+---
+Task ID: 21-exec-4
+Agent: main
+Task: Site is LIVE — debugged Vercel block + Postgres identifier bug, production verified end-to-end
+
+Work Log:
+- User screenshot: "Deployment Blocked — commit author email z@container invalid". Root cause: sandbox git identity (Z User <z@container>) ≠ connected GitHub account. Fix: repo-local git config → adamoha252-wq <336814347+adamoha252-wq@users.noreply.github.com> (noreply format, always owned by the account)
+- Git integration: org repo (Qasadan) private = unsupported on Hobby → mirrored repo to personal account adamoha252-wq/al-marsus-group (private), vercel git connect OK (production branch main)
+- Next build error exposed by real build: P2010 raw query 42P01 "relation companysettings does not exist" on /privacy export. Root cause: SQLite matches identifiers case-insensitively; PostgreSQL folds unquoted to lowercase while Prisma created mixed-case "CompanySettings". Fix: double-quoted identifiers in the 2 raw queries (src/lib/settings.ts readHeroJson/writeHeroJson; third raw query is SELECT 1, unaffected)
+- Deployments: dpl_7F8MnWuv READY (build cache made it fast). Production alias: https://al-marsus-group.vercel.app
+- LIVE VERIFICATION: all 7 routes 200; /api/health healthy + database connected (PostgreSQL); homepage renders company name + all divisions; /divisions shows all four divisions with real content; 3 hero images served 200 from /uploads (committed static assets); quote API: invalid → 422, valid → 201 persisted (id returned)
+- Worklog commit tagged [skip ci] to avoid redundant rebuild
+
+Stage Summary:
+- https://al-marsus-group.vercel.app is LIVE 24/7 on Vercel + Supabase (free tier). Public surface fully verified. Remaining: admin seeding (awaiting user's real credentials or dev-login decision), optional Vercel Blob connect for admin uploads, custom domain attach, then revoke/rotate tokens.
