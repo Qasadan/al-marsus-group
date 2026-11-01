@@ -373,3 +373,19 @@ Work Log:
 
 Stage Summary:
 - Source of truth now on private GitHub. Remaining for launch: Vercel access token + admin credentials choice → seed admin → set 3 env vars → deploy --prod → verify (routes + 73 tests) → permanent URL.
+
+---
+Task ID: 21-exec-3
+Agent: main
+Task: Vercel token received — project linked, env vars injected, build failures debugged and fixed
+
+Work Log:
+- Vercel token validated (user adamoha252-wq, Hobby plan); project al-marsus-group linked (prj_U3cZREp4koUrIBROXaBIauYksgUk); CLI-created .env.local removed (local dev keeps SQLite)
+- Env vars: first add used CLI v65 default "Sensitive/Secret" type → NOT injected into build commands → vercel-build.sh failed "DATABASE_URL is required" (2 CLI deploys: 1 fast-fail, 1 stuck BLOCKED after CLI disconnect → canceled via API)
+- Discovery: GitHub Git integration ALREADY active on the project — the exec-2 push auto-triggered a production deployment (same build error, independent of CLI streaming)
+- Root cause #2: platform scrubbed detected credentials (Supabase URLs) out of gitignored .env.deploy.local between sessions → re-add stored EMPTY values (pull len=0). Lesson: never rely on gitignored secret files across sessions; inject values within the turn that has them
+- Fix: re-injected real URLs inline with `env add --no-sensitive --force`; verified via `env pull` — DATABASE_URL len=143, DIRECT_DATABASE_URL len=128, JWT_SECRET len=44 (all Config type → available at build + runtime)
+- Rebuild triggered via git push (worklog commit); polling deployment state via API
+
+Stage Summary:
+- All three production env vars now hold verified real values. Awaiting git-triggered production build; on READY → live-site verification (routes + health + content).
