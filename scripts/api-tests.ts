@@ -371,7 +371,53 @@ async function main() {
     cookie = adminCookie;
   }
 
-  console.log("\n=== 19. Logout ===");
+  console.log("\n=== 19. Account self-service (login email + password change) ===");
+  {
+    // --- Email change: wrong password must be rejected ---
+    const badEmail = await req("POST", "/api/auth/change-email", {
+      currentPassword: "wrongpass", newEmail: `moved-${RUN}@almarsus.dev`,
+    }, true);
+    check("email change with wrong password rejected (401)", badEmail.status === 401);
+
+    // --- Email change: success + session re-issued ---
+    const moved = await req("POST", "/api/auth/change-email", {
+      currentPassword: ADMIN_PASSWORD, newEmail: `moved-${RUN}@almarsus.dev`,
+    }, true);
+    check("login email change succeeds", envelopeOk(moved));
+    const meMoved = await req("GET", "/api/auth/me");
+    check("session re-issued with new email (still signed in)",
+      envelopeOk(meMoved) && ((meMoved.json as { data?: { user?: { email?: string } } })?.data?.user?.email === `moved-${RUN}@almarsus.dev`));
+
+    // --- Duplicate email must be rejected (technician account created earlier owns this address) ---
+    const dup = await req("POST", "/api/auth/change-email", {
+      currentPassword: ADMIN_PASSWORD, newEmail: `tech-${RUN}@almarsus.dev`,
+    }, true);
+    check("changing email to an address owned by another account rejected (409)", dup.status === 409);
+
+    // --- Restore original email ---
+    const restore = await req("POST", "/api/auth/change-email", {
+      currentPassword: ADMIN_PASSWORD, newEmail: ADMIN_EMAIL,
+    }, true);
+    check("login email restored to original", envelopeOk(restore));
+
+    // --- Password change: wrong current password rejected ---
+    const badPwd = await req("POST", "/api/auth/change-password", {
+      currentPassword: "wrongpass", newPassword: "NewPass#2026x",
+    }, true);
+    check("password change with wrong current password rejected (401)", badPwd.status === 401);
+
+    // --- Password change: success, then restore ---
+    const pwdChange = await req("POST", "/api/auth/change-password", {
+      currentPassword: ADMIN_PASSWORD, newPassword: "NewPass#2026x",
+    }, true);
+    check("password change succeeds", envelopeOk(pwdChange));
+    const pwdBack = await req("POST", "/api/auth/change-password", {
+      currentPassword: "NewPass#2026x", newPassword: ADMIN_PASSWORD,
+    }, true);
+    check("password restored to original", envelopeOk(pwdBack));
+  }
+
+  console.log("\n=== 20. Logout ===");
   {
     const out = await req("POST", "/api/auth/logout");
     check("logout succeeds", envelopeOk(out));

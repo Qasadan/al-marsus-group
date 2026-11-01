@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/admin/shared";
+import { AccountSettings } from "@/components/admin/account-settings";
 import { HeroSlider } from "@/components/public/hero-slider";
 import { api, ApiClientError } from "@/lib/client";
 import { DIVISION_CODES, DIVISIONS } from "@/lib/divisions";
@@ -215,6 +216,11 @@ export default function SettingsPage() {
       />
 
       {error && <p className="mb-4 text-sm text-red-600" role="alert">{error}</p>}
+
+      {/* Admin's own login: change email + password (no code, always available) */}
+      <div className="mb-6">
+        <AccountSettings />
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-5">
