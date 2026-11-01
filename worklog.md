@@ -358,3 +358,18 @@ Work Log:
 
 Stage Summary:
 - Supabase production database is LIVE with full schema + real website content. Remaining: user sends Vercel access token (+ optional GitHub PAT, + admin email/password choice) → seed admin → vercel deploy → 73-test verification against the live URL.
+
+---
+Task ID: 21-exec-2
+Agent: main
+Task: User sent GitHub repo + PAT — push source to GitHub (assistant-run deploy, step 2 of 4)
+
+Work Log:
+- Pre-push secret audit: db/.jwt-secret NOT tracked (never was); no .env* secrets tracked; precise grep for real Supabase ref/password/GitHub token across all tracked files → CLEAN. Broad-pattern hits were documentation examples only
+- Found .env tracked (pre-dates ignore rule; contains only local SQLite path) → git rm --cached + commit; file stays on disk untracked
+- Remote origin added (clean URL); token used inline per-push only. Push -u embedded token in branch upstream config → sanitized via remote set-url + branch -u origin/main; .git/config verified token-free
+- Pushed main → github.com/Qasadan/al-marsus-group (PRIVATE, confirmed via API); ls-remote verified tip cd638b5
+- GitHub info stored in .env.deploy.local (gitignored)
+
+Stage Summary:
+- Source of truth now on private GitHub. Remaining for launch: Vercel access token + admin credentials choice → seed admin → set 3 env vars → deploy --prod → verify (routes + 73 tests) → permanent URL.
