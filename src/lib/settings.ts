@@ -69,14 +69,17 @@ function parseHero(json: unknown): HeroContent {
  * generated before the column was added (typed selects simply omit it; raw SQL
  * bypasses the client's schema snapshot). Tagged templates are parameterized,
  * so these calls are injection-safe.
+ * Identifiers are double-quoted: SQLite matches them case-insensitively, but
+ * PostgreSQL folds unquoted names to lowercase — Prisma created the table as
+ * mixed-case "CompanySettings", so unquoted references fail there (42P01).
  */
 export async function readHeroJson(): Promise<string | null> {
-  const rows = await db.$queryRaw<{ heroJson: string | null }[]>`SELECT heroJson FROM CompanySettings WHERE id = 'main'`;
+  const rows = await db.$queryRaw<{ heroJson: string | null }[]>`SELECT "heroJson" FROM "CompanySettings" WHERE id = 'main'`;
   return rows[0]?.heroJson ?? null;
 }
 
 export async function writeHeroJson(json: string | null): Promise<void> {
-  await db.$executeRaw`UPDATE CompanySettings SET heroJson = ${json} WHERE id = 'main'`;
+  await db.$executeRaw`UPDATE "CompanySettings" SET "heroJson" = ${json} WHERE id = 'main'`;
 }
 
 export interface PublicSettings {
