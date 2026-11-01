@@ -1,7 +1,14 @@
 # PROJECT STATUS — Al-Marsus Group Ltd System
 
-Last updated: 2026-10-25 (hero image slider session)
-Current state: **All 8 phases implemented, tested and browser-verified in the sandbox; full 73-assertion E2E suite also passes against the PRODUCTION build. Four-branch group expansion (Task 9) complete. Production build verified (Task 10). Preview-panel login fixed (Task 12). Public site restyled minimal/clean with persisted dark mode (Task 13). Cursor border-glow animations + no-code homepage hero editor in Admin → Settings delivered (Task 14). No-code hero IMAGE SLIDER (2–3 fast auto-sliding, glow-framed images, admin-managed) delivered (Task 15); 73/73 E2E, lint clean, production build + smoke verified.**
+Last updated: 2026-11-02 (Task 21 — production deployment live)
+Current state: **PRODUCTION LIVE: https://al-marsus-group.vercel.app (Vercel hosting + Supabase PostgreSQL, free tier, 24/7). Full 81-assertion E2E suite passes against the live production URL. Admin self-service (change login email + password in Admin → Settings) shipped. Admin login: almarsus.ltd@gmail.com (credentials stored privately in .env.deploy.local — never committed).**
+
+Production topology (Task 21):
+- Hosting: Vercel Hobby (project `al-marsus-group`, git integration active via mirror repo `adamoha252-wq/al-marsus-group`; push to main → auto production build, `bash scripts/vercel-build.sh` swaps to the PostgreSQL schema and runs `prisma db push`)
+- Database: Supabase Postgres `gevjtsinjohierbgrumu` (runtime: transaction pooler :6543 + pgbouncer; DDL: session pooler :5432; 22 tables + content seeded)
+- Env vars on Vercel: `DATABASE_URL`, `DIRECT_DATABASE_URL`, `JWT_SECRET` (verified present at build + runtime)
+- Admin self-service: `POST /api/auth/change-email` + existing `/api/auth/change-password`, surfaced as the "Your account" card in Admin → Settings (email change re-issues the session JWT; both require the current password; both are audited)
+- Deployment hygiene: `db push` (not migrate) by design on the free tier; `scripts/restore-gallery.ts` rebuilds the 11 gallery rows from the committed `/uploads` assets if a database is ever re-provisioned
 
 ---
 
@@ -145,11 +152,12 @@ Evidence: `download/preview/32–38` (desktop light hero, dark desktop, mobile d
 
 ## 4. Remaining tasks (external to sandbox)
 
-1. Provision PostgreSQL (Supabase), switch datasource provider, run `prisma migrate dev` to generate versioned SQL migrations, `prisma db push`/deploy.
-2. Set real `ADMIN_EMAIL`, `ADMIN_PASSWORD`; run seed; **change admin password after first login**. (`JWT_SECRET` is auto-provisioned by `start.sh` if not injected, but an explicit value is still recommended.)
-3. Configure company settings (contact details, about text, division service catalogues, terms, currency, tax rate) in Admin → Settings.
-4. Optional hardening: object storage for uploads, Redis rate-limiting, email/SMS provider, server-side PDF rendering, monitoring/logging aggregation.
-5. Schedule DB backups per DEPLOYMENT.md §7 and verify a restore.
+1. ~~Provision PostgreSQL~~ DONE (Task 21 — Supabase, live).
+2. ~~Set real admin credentials; run seed~~ DONE (Task 21 — almarsus.ltd@gmail.com seeded; password delivered privately, **change it after first login in Admin → Settings → Your account**, which is now self-service).
+3. Configure remaining company settings (contact details, division service catalogues, terms) in Admin → Settings if placeholders remain.
+4. Optional: attach a custom domain in Vercel → Settings → Domains; connect Vercel Blob for admin uploads (uploads currently fall back to `/uploads` static assets + Blob when configured); monitoring/logging.
+5. Schedule DB backups (Supabase free tier has none) — periodic `pg_dump` per DEPLOYMENT.md §7.
+6. Rotate/revoke the GitHub + Vercel tokens shared during deployment (they were transmitted in chat; treat as exposed).
 
 Environment note (Task 10, honest record): the sandbox reaps any process spawned from a tool call when the call ends, and the harness supervisor only launches the dev server at boot. The dev server was stopped for the production build and could not be re-attached persistently from a tool call; serving is handled by the platform pipeline (`Complete` → `.zscripts/build.sh` + `start.sh`), which the verified standalone build unblocks.
 
